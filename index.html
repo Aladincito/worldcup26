@@ -48,6 +48,10 @@
   .flagimg{display:block;width:24px;height:16px;object-fit:cover;border-radius:2px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.3);}
   .flag.code{min-width:32px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--muted);background:var(--ink-2);border:1px solid var(--line-soft);border-radius:4px;padding:2px 3px;line-height:1.4;}
   .seed-team .tn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dropflag{flex:none;display:inline-flex;align-items:center;}
+  .dropflag:empty{display:none;}
+  .champ-row{display:flex;align-items:center;justify-content:center;gap:8px;}
+  .champ-row .champ-select{width:auto;flex:0 1 auto;}
   .row.q .pos{color:var(--mint);}
   .row.third .pos{color:var(--amber);}
   .row input.team{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:13px;font-weight:500;padding:5px 0;}
@@ -402,7 +406,8 @@ function slotEl(mid,s){
   const wrap=document.createElement('label');wrap.className='slot';wrap.dataset.key=key;
   if(p.type==='seed'||p.type==='loser'||p.type==='third'){
     const span=document.createElement('span');span.className='seed-team';span.dataset.disp=key;wrap.appendChild(span);
-  }else{ // third or winner -> dropdown
+  }else{ // winner -> dropdown with live flag
+    const fh=document.createElement('span');fh.className='dropflag';fh.dataset.flag=key;wrap.appendChild(fh);
     const sel=document.createElement('select');sel.dataset.sel=key;
     sel.addEventListener('change',()=>{
       state.picks[key]=sel.value;
@@ -435,7 +440,9 @@ function renderBracket(){
   champ.innerHTML='<div class="trophy">🏆</div><div class="lbl">World Champion</div>';
   const csel=document.createElement('select');csel.className='champ-select';csel.id='champSelect';
   csel.addEventListener('change',()=>{state.picks['CHAMP']=csel.value;rebuild();save();});
-  champ.appendChild(csel);block.appendChild(champ);
+  const crow=document.createElement('div');crow.className='champ-row';
+  const cfh=document.createElement('span');cfh.className='dropflag champ-flag';cfh.dataset.flag='CHAMP';
+  crow.appendChild(cfh);crow.appendChild(csel);champ.appendChild(crow);block.appendChild(champ);
   const third=document.createElement('div');third.className='third-pp';
   const tc=document.createElement('p');tc.className='code';tc.textContent='3rd Place Play-off';third.appendChild(tc);
   third.appendChild(slotEl('M103','a'));third.appendChild(slotEl('M103','b'));block.appendChild(third);
@@ -475,6 +482,7 @@ function rebuild(){
   // champion
   const csel=document.getElementById('champSelect');
   if(csel)fillSelect(csel,'CHAMP',[valueOf('M104','a'),valueOf('M104','b')],'Pick the winner',state.picks);
+  updateDropFlags();
   // 3rd place losers (display)
   ['a','b'].forEach(s=>{const span=document.querySelector('[data-disp="M103.'+s+'"]');if(!span)return;paintTeam(span,valueOf('M103',s),slotPH('M103',s));});
   // highlight winners
@@ -485,6 +493,14 @@ function rebuild(){
       const s=sl.dataset.key.split('.')[1];sl.classList.remove('won','lost');
       if(adv&&(ta||tb)){const t=s==='a'?ta:tb;if(t)sl.classList.add(t===adv?'won':'lost');}
     });
+  });
+}
+function updateDropFlags(){
+  document.querySelectorAll('[data-flag]').forEach(h=>{
+    const key=h.dataset.flag;let team='';
+    if(key==='CHAMP'){const cs=document.getElementById('champSelect');team=cs?cs.value:'';}
+    else{const parts=key.split('.');team=valueOf(parts[0],parts[1]);}
+    h.innerHTML='';if(team)h.appendChild(flagNode(team));
   });
 }
 

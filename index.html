@@ -45,7 +45,7 @@
   .row.out{border-left-color:var(--muted-2);opacity:.72;}
   .pos{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;font-weight:700;width:14px;text-align:center;color:var(--muted);}
   .flag{flex:none;display:inline-flex;align-items:center;justify-content:center;}
-  .flagimg{display:block;width:24px;height:16px;border-radius:2px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.3);}
+  .flagimg{display:block;width:24px;height:16px;object-fit:cover;border-radius:2px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.3);}
   .flag.code{min-width:32px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--muted);background:var(--ink-2);border:1px solid var(--line-soft);border-radius:4px;padding:2px 3px;line-height:1.4;}
   .seed-team .tn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .row.q .pos{color:var(--mint);}
@@ -269,10 +269,15 @@ const SVGFLAGS={
 };
 function flagNode(team){
   const wrap=document.createElement('span');wrap.className='flag';
-  const svg=SVGFLAGS[team?team.trim():''];
-  if(!svg){wrap.textContent=flagFor(team);wrap.classList.add('code');return wrap;}
-  wrap.innerHTML='<svg class="flagimg" viewBox="0 0 24 16" preserveAspectRatio="xMidYMid meet">'+svg+'</svg>';
-  return wrap;
+  const t=team?team.trim():'';
+  const fallback=function(){const svg=SVGFLAGS[t];wrap.innerHTML='';if(svg){wrap.classList.remove('code');wrap.innerHTML='<svg class="flagimg" viewBox="0 0 24 16" preserveAspectRatio="xMidYMid meet">'+svg+'</svg>';}else{wrap.classList.add('code');wrap.textContent=flagFor(t);}};
+  const iso=isoFor(t);
+  if(!iso){fallback();return wrap;}
+  const img=document.createElement('img');img.className='flagimg';img.alt='';img.loading='lazy';
+  img.src='https://flagcdn.com/h24/'+iso+'.png';
+  img.srcset='https://flagcdn.com/h48/'+iso+'.png 2x';
+  img.onerror=fallback;
+  wrap.appendChild(img);return wrap;
 }
 function paintTeam(span,t,ph){
   span.classList.remove('empty');span.innerHTML='';

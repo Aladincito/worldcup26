@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>World Cup 2026 — Group + Bracket Predictor</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --ink:#0A1E29;--ink-2:#0E2733;--panel:#123141;--panel-2:#163A4C;
@@ -20,71 +17,74 @@
       radial-gradient(1200px 600px at 80% -10%, #14394a 0%, rgba(20,57,74,0) 60%),
       radial-gradient(900px 500px at -5% 110%, #10303f 0%, rgba(16,48,63,0) 55%),
       var(--ink);
-    color:var(--text);font-family:'Inter',system-ui,sans-serif;
+    color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
     -webkit-font-smoothing:antialiased;min-height:100vh;
   }
   header{padding:22px 20px 14px;border-bottom:1px solid var(--line-soft);}
-  .eyebrow{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin:0 0 6px;}
-  h1{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:clamp(26px,6vw,42px);line-height:.98;margin:0;}
+  .eyebrow{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin:0 0 6px;}
+  h1{font-family:'Oswald','Arial Narrow',system-ui,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:clamp(26px,6vw,42px);line-height:.98;margin:0;}
   h1 .thin{color:var(--muted);font-weight:400;}
   .sub{color:var(--muted);font-size:13px;margin:8px 0 0;max-width:660px;line-height:1.45;}
   .toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;}
-  .status{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--muted-2);margin-right:auto;}
+  .status{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:.06em;color:var(--muted-2);margin-right:auto;}
   .status .dot{color:var(--mint);}
-  button.btn{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:12px;font-weight:600;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:9px 14px;cursor:pointer;transition:background .15s,border-color .15s;}
+  button.btn{font-family:'Oswald','Arial Narrow',system-ui,sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:12px;font-weight:600;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:9px 14px;cursor:pointer;transition:background .15s,border-color .15s;}
   button.btn:hover{background:var(--panel-2);border-color:var(--gold-deep);}
   button.btn.ghost{background:transparent;}
 
-  .section-label{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.18em;font-size:13px;font-weight:600;color:var(--text);padding:20px 20px 0;display:flex;align-items:baseline;gap:10px;}
-  .section-label .hint{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.04em;color:var(--muted-2);text-transform:none;}
+  .section-label{font-family:'Oswald','Arial Narrow',system-ui,sans-serif;text-transform:uppercase;letter-spacing:.18em;font-size:13px;font-weight:600;color:var(--text);padding:20px 20px 0;display:flex;align-items:baseline;gap:10px;}
+  .section-label .hint{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:.04em;color:var(--muted-2);text-transform:none;}
 
   .groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:12px;padding:12px 20px 4px;}
   .group{background:linear-gradient(180deg,var(--panel) 0%,var(--ink-2) 100%);border:1px solid var(--line-soft);border-radius:10px;padding:9px 9px 7px;}
-  .group h3{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:13px;margin:0 0 8px;color:var(--text);display:flex;align-items:center;gap:7px;}
-  .group h3 .tag{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted-2);letter-spacing:.04em;font-weight:400;text-transform:none;margin-left:auto;}
+  .group h3{font-family:'Oswald','Arial Narrow',system-ui,sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:13px;margin:0 0 8px;color:var(--text);display:flex;align-items:center;gap:7px;}
+  .group h3 .tag{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9px;color:var(--muted-2);letter-spacing:.04em;font-weight:400;text-transform:none;margin-left:auto;}
   .row{display:flex;align-items:center;gap:6px;background:var(--ink);border:1px solid transparent;border-left:3px solid var(--line);border-radius:6px;padding:3px 5px;margin:4px 0;}
   .row.q{border-left-color:var(--mint);}
   .row.third{border-left-color:var(--amber);}
   .row.out{border-left-color:var(--muted-2);opacity:.72;}
-  .pos{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;width:14px;text-align:center;color:var(--muted);}
-  .flag{flex:none;width:22px;text-align:center;font-size:15px;line-height:1;}
+  .pos{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;font-weight:700;width:14px;text-align:center;color:var(--muted);}
+  .flag{flex:none;display:inline-flex;align-items:center;justify-content:center;}
+  .flagimg{display:block;width:24px;height:16px;border-radius:2px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.3);}
+  .flag.code{min-width:32px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;font-weight:700;letter-spacing:.04em;color:var(--muted);background:var(--ink-2);border:1px solid var(--line-soft);border-radius:4px;padding:2px 3px;line-height:1.4;}
+  .seed-team .tn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .row.q .pos{color:var(--mint);}
   .row.third .pos{color:var(--amber);}
-  .row input.team{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:5px 0;}
+  .row input.team{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:13px;font-weight:500;padding:5px 0;}
   .arrows{display:flex;flex-direction:column;gap:1px;}
   .arrows button{width:20px;height:14px;line-height:1;padding:0;border:none;background:transparent;color:var(--muted-2);cursor:pointer;font-size:10px;border-radius:3px;}
   .arrows button:hover:not(:disabled){color:var(--gold);background:rgba(232,184,75,.12);}
   .arrows button:disabled{opacity:.25;cursor:default;}
-  .glegend{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted-2);padding:2px 20px 4px;letter-spacing:.03em;}
+  .glegend{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;color:var(--muted-2);padding:2px 20px 4px;letter-spacing:.03em;}
   .glegend b{color:var(--mint);font-weight:400;}
   .glegend i{color:var(--amber);font-style:normal;}
-  .counter{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);padding:0 20px 6px;letter-spacing:.03em;}
+  .counter{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--muted);padding:0 20px 6px;letter-spacing:.03em;}
   .counter.done{color:var(--mint);}
   .counter.pulse{animation:cpulse .45s ease;}
   @keyframes cpulse{0%{color:var(--amber);transform:translateX(0);}25%{transform:translateX(2px);}50%{transform:translateX(-2px);}100%{}}
-  .qual{flex:none;border:1px solid var(--line);background:transparent;color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.04em;border-radius:5px;padding:3px 6px;cursor:pointer;white-space:nowrap;}
+  .qual{flex:none;border:1px solid var(--line);background:transparent;color:var(--muted);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:.04em;border-radius:5px;padding:3px 6px;cursor:pointer;white-space:nowrap;}
   .qual:hover{border-color:var(--amber);color:var(--amber);}
   .qual.on{background:rgba(224,145,60,.18);border-color:var(--amber);color:var(--amber);font-weight:700;}
 
-  .scroll-hint{display:none;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted-2);padding:10px 20px 0;}
+  .scroll-hint{display:none;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--muted-2);padding:10px 20px 0;}
   @media(max-width:760px){.scroll-hint{display:block;}}
 
   .board-wrap{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:14px 20px 40px;}
   .board{display:flex;gap:18px;align-items:stretch;min-width:max-content;}
   .col{display:flex;flex-direction:column;justify-content:space-around;min-width:186px;width:186px;}
   .col.final-col{min-width:208px;width:208px;justify-content:center;}
-  .col-head{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:600;color:var(--muted);padding-bottom:4px;margin-bottom:10px;border-bottom:1px solid var(--line-soft);position:sticky;top:0;text-align:center;}
-  .col-head .n{color:var(--gold);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.05em;}
+  .col-head{font-family:'Oswald','Arial Narrow',system-ui,sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:600;color:var(--muted);padding-bottom:4px;margin-bottom:10px;border-bottom:1px solid var(--line-soft);position:sticky;top:0;text-align:center;}
+  .col-head .n{color:var(--gold);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:.05em;}
 
   .match{background:linear-gradient(180deg,var(--panel) 0%,var(--ink-2) 100%);border:1px solid var(--line-soft);border-radius:9px;margin:9px 0;padding:6px;}
-  .match .code{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:var(--muted-2);text-align:center;margin:0 0 5px;text-transform:uppercase;}
+  .match .code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9px;letter-spacing:.08em;color:var(--muted-2);text-align:center;margin:0 0 5px;text-transform:uppercase;}
   .slot{display:flex;align-items:center;gap:4px;background:var(--ink);border:1px solid transparent;border-radius:6px;padding:2px 8px;margin:3px 0;transition:border-color .15s,background .15s;}
   .slot:focus-within{border-color:var(--line);}
-  .slot select,.slot input{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:6px 0;cursor:pointer;}
+  .slot select,.slot input{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:13px;font-weight:500;padding:6px 0;cursor:pointer;}
   .slot select option{background:var(--ink-2);color:var(--text);}
-  .slot select:invalid,.slot select.placeholder{color:var(--muted-2);font-family:'Space Mono',monospace;font-size:11px;}
-  .seed-team{flex:1;min-width:0;padding:6px 0;font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .seed-team.empty{color:var(--muted-2);font-family:'Space Mono',monospace;font-size:11px;font-weight:400;letter-spacing:.02em;}
+  .slot select:invalid,.slot select.placeholder{color:var(--muted-2);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;}
+  .seed-team{flex:1;min-width:0;display:flex;align-items:center;gap:5px;padding:6px 0;font-size:13px;font-weight:600;color:var(--text);}
+  .seed-team.empty{color:var(--muted-2);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;font-weight:400;letter-spacing:.02em;}
   .slot.won{background:linear-gradient(90deg,rgba(63,216,164,.16),rgba(63,216,164,.04));border-color:rgba(63,216,164,.45);}
   .slot.won .seed-team,.slot.won select{font-weight:700;}
   .slot.lost{opacity:.42;}
@@ -94,12 +94,12 @@
   .match.final .code{color:var(--gold);}
   .champion{width:100%;border:1px solid var(--gold-deep);border-radius:11px;background:radial-gradient(120% 140% at 50% 0%, rgba(232,184,75,.18) 0%, rgba(232,184,75,0) 60%),linear-gradient(180deg,#13313f,#0a1f29);padding:16px 12px;text-align:center;}
   .champion .trophy{font-size:26px;line-height:1;filter:drop-shadow(0 4px 10px rgba(232,184,75,.4));}
-  .champion .lbl{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.22em;font-size:10px;color:var(--gold);margin:8px 0 6px;}
-  .champ-select{width:100%;background:var(--ink);border:1px solid var(--gold-deep);border-radius:7px;color:var(--gold);font-family:'Oswald',sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.04em;padding:9px 8px;text-align:center;text-align-last:center;cursor:pointer;}
-  .champ-select option{background:var(--ink-2);color:var(--text);font-family:'Inter',sans-serif;text-transform:none;letter-spacing:0;}
+  .champion .lbl{font-family:'Oswald','Arial Narrow',system-ui,sans-serif;text-transform:uppercase;letter-spacing:.22em;font-size:10px;color:var(--gold);margin:8px 0 6px;}
+  .champ-select{width:100%;background:var(--ink);border:1px solid var(--gold-deep);border-radius:7px;color:var(--gold);font-family:'Oswald','Arial Narrow',system-ui,sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.04em;padding:9px 8px;text-align:center;text-align-last:center;cursor:pointer;}
+  .champ-select option{background:var(--ink-2);color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;text-transform:none;letter-spacing:0;}
   .third-pp{width:100%;border:1px dashed var(--line);border-radius:9px;padding:6px;background:rgba(18,49,65,.5);}
-  .third-pp .code{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:var(--muted-2);text-align:center;margin:0 0 5px;text-transform:uppercase;}
-  footer{color:var(--muted-2);font-size:11px;padding:0 20px 30px;line-height:1.5;font-family:'Space Mono',monospace;letter-spacing:.02em;}
+  .third-pp .code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:9px;letter-spacing:.08em;color:var(--muted-2);text-align:center;margin:0 0 5px;text-transform:uppercase;}
+  footer{color:var(--muted-2);font-size:11px;padding:0 20px 30px;line-height:1.5;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.02em;}
 
   @media print{
     @page{size:landscape;margin:9mm;}
@@ -118,7 +118,8 @@
     .row.out{opacity:.6;}
     .pos{color:#555;}
     .row input.team{color:#0b1f2a;font-size:11px;padding:2px 0;}
-    .flag{font-size:13px;width:20px;}
+    .flagimg{width:20px;height:14px;box-shadow:0 0 0 1px #ccc;}
+    .flag.code{color:#444;background:#fff;border:1px solid #ccc;}
     .board-wrap{overflow:visible;padding:5px 0;}
     .board{gap:7px;min-width:0;width:100%;font-size:10.5px;}
     .col{min-width:0;width:auto;flex:1;}
@@ -191,22 +192,94 @@ const GROUPS_INIT={
 };
 const GROUP_LETTERS=['A','B','C','D','E','F','G','H','I','J','K','L'];
 
-const FLAGS={
-  'Mexico':'🇲🇽','South Korea':'🇰🇷','Czechia':'🇨🇿','South Africa':'🇿🇦',
-  'Switzerland':'🇨🇭','Canada':'🇨🇦','Qatar':'🇶🇦','Bosnia & Herzegovina':'🇧🇦',
-  'Brazil':'🇧🇷','Scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','Morocco':'🇲🇦','Haiti':'🇭🇹',
-  'USA':'🇺🇸','Australia':'🇦🇺','Türkiye':'🇹🇷','Paraguay':'🇵🇾',
-  'Germany':'🇩🇪','Ivory Coast':'🇨🇮','Ecuador':'🇪🇨','Curaçao':'🇨🇼',
-  'Sweden':'🇸🇪','Japan':'🇯🇵','Netherlands':'🇳🇱','Tunisia':'🇹🇳',
-  'Belgium':'🇧🇪','Egypt':'🇪🇬','Iran':'🇮🇷','New Zealand':'🇳🇿',
-  'Spain':'🇪🇸','Uruguay':'🇺🇾','Saudi Arabia':'🇸🇦','Cape Verde':'🇨🇻',
-  'France':'🇫🇷','Senegal':'🇸🇳','Norway':'🇳🇴','Iraq':'🇮🇶',
-  'Argentina':'🇦🇷','Austria':'🇦🇹','Algeria':'🇩🇿','Jordan':'🇯🇴',
-  'Portugal':'🇵🇹','Colombia':'🇨🇴','Uzbekistan':'🇺🇿','DR Congo':'🇨🇩',
-  'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Croatia':'🇭🇷','Ghana':'🇬🇭','Panama':'🇵🇦'
+const CODES={
+ 'Mexico':'MEX','South Korea':'KOR','Czechia':'CZE','South Africa':'RSA',
+ 'Switzerland':'SUI','Canada':'CAN','Qatar':'QAT','Bosnia & Herzegovina':'BIH',
+ 'Brazil':'BRA','Scotland':'SCO','Morocco':'MAR','Haiti':'HAI',
+ 'USA':'USA','Australia':'AUS','Türkiye':'TUR','Paraguay':'PAR',
+ 'Germany':'GER','Ivory Coast':'CIV','Ecuador':'ECU','Curaçao':'CUW',
+ 'Sweden':'SWE','Japan':'JPN','Netherlands':'NED','Tunisia':'TUN',
+ 'Belgium':'BEL','Egypt':'EGY','Iran':'IRN','New Zealand':'NZL',
+ 'Spain':'ESP','Uruguay':'URU','Saudi Arabia':'KSA','Cape Verde':'CPV',
+ 'France':'FRA','Senegal':'SEN','Norway':'NOR','Iraq':'IRQ',
+ 'Argentina':'ARG','Austria':'AUT','Algeria':'ALG','Jordan':'JOR',
+ 'Portugal':'POR','Colombia':'COL','Uzbekistan':'UZB','DR Congo':'COD',
+ 'England':'ENG','Croatia':'CRO','Ghana':'GHA','Panama':'PAN'
 };
-function flagFor(t){return t?(FLAGS[t.trim()]||''):'';}
-function withFlag(t){const f=flagFor(t);return f?f+' '+t:t;}
+function flagFor(t){return t?(CODES[t.trim()]||''):'';}
+function withFlag(t){const c=flagFor(t);return c?c+' '+t:t;}
+const ISO={
+ 'Mexico':'mx','South Korea':'kr','Czechia':'cz','South Africa':'za','Switzerland':'ch','Canada':'ca','Qatar':'qa','Bosnia & Herzegovina':'ba',
+ 'Brazil':'br','Scotland':'gb-sct','Morocco':'ma','Haiti':'ht','USA':'us','Australia':'au','Türkiye':'tr','Paraguay':'py',
+ 'Germany':'de','Ivory Coast':'ci','Ecuador':'ec','Curaçao':'cw','Sweden':'se','Japan':'jp','Netherlands':'nl','Tunisia':'tn',
+ 'Belgium':'be','Egypt':'eg','Iran':'ir','New Zealand':'nz','Spain':'es','Uruguay':'uy','Saudi Arabia':'sa','Cape Verde':'cv',
+ 'France':'fr','Senegal':'sn','Norway':'no','Iraq':'iq','Argentina':'ar','Austria':'at','Algeria':'dz','Jordan':'jo',
+ 'Portugal':'pt','Colombia':'co','Uzbekistan':'uz','DR Congo':'cd','England':'gb-eng','Croatia':'hr','Ghana':'gh','Panama':'pa'
+};
+function isoFor(t){return t?(ISO[t.trim()]||''):'';}
+const SVGFLAGS={
+"Mexico":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#fff\"/><rect x=\"0\" y=\"0\" width=\"8\" height=\"16\" fill=\"#006847\"/><rect x=\"16\" y=\"0\" width=\"8\" height=\"16\" fill=\"#ce1126\"/><circle cx=\"12\" cy=\"8\" r=\"1.5\" fill=\"#8a5a2b\"/>",
+"South Korea":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#fff\"/><path d=\"M12 5.2a2.8 2.8 0 0 1 0 5.6 1.4 1.4 0 0 0 0-2.8 1.4 1.4 0 0 1 0-2.8z\" fill=\"#c60c30\"/><path d=\"M12 10.8a2.8 2.8 0 0 1 0-5.6 1.4 1.4 0 0 0 0 2.8 1.4 1.4 0 0 1 0 2.8z\" fill=\"#003478\"/><rect x=\"2.3\" y=\"2.4\" width=\"3.3\" height=\"0.6\" fill=\"#000\"/><rect x=\"2.3\" y=\"3.45\" width=\"3.3\" height=\"0.6\" fill=\"#000\"/><rect x=\"2.3\" y=\"4.5\" width=\"3.3\" height=\"0.6\" fill=\"#000\"/><rect x=\"18.4\" y=\"2.4\" width=\"3.3\" height=\"0.6\" fill=\"#000\"/><rect x=\"18.4\" y=\"3.45\" width=\"3.3\" height=\"0.6\" fill=\"#000\"/><rect x=\"18.4\" y=\"4.5\" width=\"3.3\" height=\"0.6\" fill=\"#000\"/><rect x=\"2.3\" y=\"11.0\" width=\"3.3\" height=\"0.6\" fill=\"#000\"/><rect x=\"2.3\" y=\"12.05\" width=\"3.3\" height=\"0.6\" fill=\"#000\"/><rect x=\"2.3\" y=\"13.1\" width=\"3.3\" height=\"0.6\" fill=\"#000\"/><rect x=\"18.4\" y=\"11.0\" width=\"3.3\" height=\"0.6\" fill=\"#000\"/><rect x=\"18.4\" y=\"12.05\" width=\"3.3\" height=\"0.6\" fill=\"#000\"/><rect x=\"18.4\" y=\"13.1\" width=\"3.3\" height=\"0.6\" fill=\"#000\"/>",
+"Czechia":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#fff\"/><rect x=\"0\" y=\"8\" width=\"24\" height=\"8\" fill=\"#d7141a\"/><polygon points=\"0,0 12,8 0,16\" fill=\"#11457e\"/>",
+"South Africa":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"8\" fill=\"#de3831\"/><rect x=\"0\" y=\"8\" width=\"24\" height=\"8\" fill=\"#002395\"/><polygon points=\"0,1 11,8 0,15\" fill=\"#ffb612\"/><rect x=\"8\" y=\"5.5\" width=\"16\" height=\"5\" fill=\"#ffb612\"/><polygon points=\"0,3 8,8 0,13\" fill=\"#007a4d\"/><rect x=\"8\" y=\"6.6\" width=\"16\" height=\"2.8\" fill=\"#007a4d\"/><polygon points=\"0,4.3 5.3,8 0,11.7\" fill=\"#000\"/>",
+"Switzerland":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#d52b1e\"/><rect x=\"10.5\" y=\"4.5\" width=\"3\" height=\"7\" fill=\"#fff\"/><rect x=\"8.5\" y=\"6.5\" width=\"7\" height=\"3\" fill=\"#fff\"/>",
+"Canada":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#fff\"/><rect x=\"0\" y=\"0\" width=\"5\" height=\"16\" fill=\"#d52b1e\"/><rect x=\"19\" y=\"0\" width=\"5\" height=\"16\" fill=\"#d52b1e\"/><polygon points=\"12,3 12.7,6 14.8,5.6 13.4,7.4 15.6,8 13.4,8.6 13.9,10.8 12,9.6 10.1,10.8 10.6,8.6 8.4,8 10.6,7.4 9.2,5.6 11.3,6\" fill=\"#d52b1e\"/><rect x=\"11.7\" y=\"10.5\" width=\"0.6\" height=\"2\" fill=\"#d52b1e\"/>",
+"Qatar":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#8a1538\"/><rect x=\"0\" y=\"0\" width=\"8\" height=\"16\" fill=\"#fff\"/><polygon points=\"8,0 6,1.8 8,3.6 6,5.3 8,7.1 6,8.9 8,10.7 6,12.4 8,14.2 6,16 8,16\" fill=\"#8a1538\"/>",
+"Bosnia & Herzegovina":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#002395\"/><polygon points=\"5,1 21,1 5,15\" fill=\"#fecb00\"/><polygon points=\"20.00,1.15 20.19,1.74 20.81,1.74 20.31,2.10 20.50,2.69 20.00,2.32 19.50,2.69 19.69,2.10 19.19,1.74 19.81,1.74\" fill=\"#fff\"/><polygon points=\"17.67,3.15 17.86,3.74 18.48,3.74 17.98,4.10 18.17,4.69 17.67,4.32 17.17,4.69 17.36,4.10 16.86,3.74 17.48,3.74\" fill=\"#fff\"/><polygon points=\"15.33,5.15 15.52,5.74 16.14,5.74 15.64,6.10 15.83,6.69 15.33,6.32 14.83,6.69 15.02,6.10 14.52,5.74 15.14,5.74\" fill=\"#fff\"/><polygon points=\"13.00,7.15 13.19,7.74 13.81,7.74 13.31,8.10 13.50,8.69 13.00,8.32 12.50,8.69 12.69,8.10 12.19,7.74 12.81,7.74\" fill=\"#fff\"/><polygon points=\"10.67,9.15 10.86,9.74 11.48,9.74 10.98,10.10 11.17,10.69 10.67,10.32 10.17,10.69 10.36,10.10 9.86,9.74 10.48,9.74\" fill=\"#fff\"/><polygon points=\"8.33,11.15 8.52,11.74 9.14,11.74 8.64,12.10 8.83,12.69 8.33,12.32 7.83,12.69 8.02,12.10 7.52,11.74 8.14,11.74\" fill=\"#fff\"/><polygon points=\"6.00,13.15 6.19,13.74 6.81,13.74 6.31,14.10 6.50,14.69 6.00,14.32 5.50,14.69 5.69,14.10 5.19,13.74 5.81,13.74\" fill=\"#fff\"/>",
+"Brazil":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#009c3b\"/><polygon points=\"12,1.5 22.5,8 12,14.5 1.5,8\" fill=\"#ffdf00\"/><circle cx=\"12\" cy=\"8\" r=\"3.4\" fill=\"#002776\"/><path d=\"M9.1 7 Q12 6 14.9 7.6\" stroke=\"#fff\" stroke-width=\"0.6\" fill=\"none\"/><polygon points=\"11.00,6.55 11.10,6.86 11.43,6.86 11.16,7.05 11.26,7.36 11.00,7.17 10.74,7.36 10.84,7.05 10.57,6.86 10.90,6.86\" fill=\"#fff\"/><polygon points=\"13.00,6.75 13.10,7.06 13.43,7.06 13.16,7.25 13.26,7.56 13.00,7.37 12.74,7.56 12.84,7.25 12.57,7.06 12.90,7.06\" fill=\"#fff\"/><polygon points=\"12.00,8.55 12.10,8.86 12.43,8.86 12.16,9.05 12.26,9.36 12.00,9.17 11.74,9.36 11.84,9.05 11.57,8.86 11.90,8.86\" fill=\"#fff\"/><polygon points=\"10.40,8.15 10.50,8.46 10.83,8.46 10.56,8.65 10.66,8.96 10.40,8.77 10.14,8.96 10.24,8.65 9.97,8.46 10.30,8.46\" fill=\"#fff\"/><polygon points=\"13.40,8.35 13.50,8.66 13.83,8.66 13.56,8.85 13.66,9.16 13.40,8.97 13.14,9.16 13.24,8.85 12.97,8.66 13.30,8.66\" fill=\"#fff\"/>",
+"Scotland":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#0065bf\"/><path d=\"M0,0 24,16 M24,0 0,16\" stroke=\"#fff\" stroke-width=\"2.8\"/>",
+"Morocco":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#c1272d\"/><polygon points=\"12.00,4.60 12.76,6.95 15.23,6.95 13.24,8.40 14.00,10.75 12.00,9.30 10.00,10.75 10.76,8.40 8.77,6.95 11.24,6.95\" fill=\"#006233\"/>",
+"Haiti":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"8\" fill=\"#00209f\"/><rect x=\"0\" y=\"8\" width=\"24\" height=\"8\" fill=\"#d21034\"/><rect x=\"9.3\" y=\"5.3\" width=\"5.4\" height=\"5.4\" fill=\"#fff\"/><circle cx=\"12\" cy=\"8\" r=\"1\" fill=\"#016a16\"/>",
+"USA":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#b22234\"/><rect x=\"0\" y=\"1.2307692307692308\" width=\"24\" height=\"1.2307692307692308\" fill=\"#fff\"/><rect x=\"0\" y=\"3.6923076923076925\" width=\"24\" height=\"1.2307692307692308\" fill=\"#fff\"/><rect x=\"0\" y=\"6.153846153846154\" width=\"24\" height=\"1.2307692307692308\" fill=\"#fff\"/><rect x=\"0\" y=\"8.615384615384615\" width=\"24\" height=\"1.2307692307692308\" fill=\"#fff\"/><rect x=\"0\" y=\"11.076923076923077\" width=\"24\" height=\"1.2307692307692308\" fill=\"#fff\"/><rect x=\"0\" y=\"13.538461538461538\" width=\"24\" height=\"1.2307692307692308\" fill=\"#fff\"/><rect x=\"0\" y=\"0\" width=\"10\" height=\"8.615384615384615\" fill=\"#3c3b6e\"/><polygon points=\"1.40,0.60 1.51,0.95 1.88,0.95 1.58,1.16 1.69,1.50 1.40,1.29 1.11,1.50 1.22,1.16 0.92,0.95 1.29,0.95\" fill=\"#fff\"/><polygon points=\"3.10,0.60 3.21,0.95 3.58,0.95 3.28,1.16 3.39,1.50 3.10,1.29 2.81,1.50 2.92,1.16 2.62,0.95 2.99,0.95\" fill=\"#fff\"/><polygon points=\"4.80,0.60 4.91,0.95 5.28,0.95 4.98,1.16 5.09,1.50 4.80,1.29 4.51,1.50 4.62,1.16 4.32,0.95 4.69,0.95\" fill=\"#fff\"/><polygon points=\"6.50,0.60 6.61,0.95 6.98,0.95 6.68,1.16 6.79,1.50 6.50,1.29 6.21,1.50 6.32,1.16 6.02,0.95 6.39,0.95\" fill=\"#fff\"/><polygon points=\"8.20,0.60 8.31,0.95 8.68,0.95 8.38,1.16 8.49,1.50 8.20,1.29 7.91,1.50 8.02,1.16 7.72,0.95 8.09,0.95\" fill=\"#fff\"/><polygon points=\"2.25,2.00 2.36,2.35 2.73,2.35 2.43,2.56 2.54,2.90 2.25,2.69 1.96,2.90 2.07,2.56 1.77,2.35 2.14,2.35\" fill=\"#fff\"/><polygon points=\"3.95,2.00 4.06,2.35 4.43,2.35 4.13,2.56 4.24,2.90 3.95,2.69 3.66,2.90 3.77,2.56 3.47,2.35 3.84,2.35\" fill=\"#fff\"/><polygon points=\"5.65,2.00 5.76,2.35 6.13,2.35 5.83,2.56 5.94,2.90 5.65,2.69 5.36,2.90 5.47,2.56 5.17,2.35 5.54,2.35\" fill=\"#fff\"/><polygon points=\"7.35,2.00 7.46,2.35 7.83,2.35 7.53,2.56 7.64,2.90 7.35,2.69 7.06,2.90 7.17,2.56 6.87,2.35 7.24,2.35\" fill=\"#fff\"/><polygon points=\"1.40,3.40 1.51,3.75 1.88,3.75 1.58,3.96 1.69,4.30 1.40,4.09 1.11,4.30 1.22,3.96 0.92,3.75 1.29,3.75\" fill=\"#fff\"/><polygon points=\"3.10,3.40 3.21,3.75 3.58,3.75 3.28,3.96 3.39,4.30 3.10,4.09 2.81,4.30 2.92,3.96 2.62,3.75 2.99,3.75\" fill=\"#fff\"/><polygon points=\"4.80,3.40 4.91,3.75 5.28,3.75 4.98,3.96 5.09,4.30 4.80,4.09 4.51,4.30 4.62,3.96 4.32,3.75 4.69,3.75\" fill=\"#fff\"/><polygon points=\"6.50,3.40 6.61,3.75 6.98,3.75 6.68,3.96 6.79,4.30 6.50,4.09 6.21,4.30 6.32,3.96 6.02,3.75 6.39,3.75\" fill=\"#fff\"/><polygon points=\"8.20,3.40 8.31,3.75 8.68,3.75 8.38,3.96 8.49,4.30 8.20,4.09 7.91,4.30 8.02,3.96 7.72,3.75 8.09,3.75\" fill=\"#fff\"/><polygon points=\"2.25,4.80 2.36,5.15 2.73,5.15 2.43,5.36 2.54,5.70 2.25,5.49 1.96,5.70 2.07,5.36 1.77,5.15 2.14,5.15\" fill=\"#fff\"/><polygon points=\"3.95,4.80 4.06,5.15 4.43,5.15 4.13,5.36 4.24,5.70 3.95,5.49 3.66,5.70 3.77,5.36 3.47,5.15 3.84,5.15\" fill=\"#fff\"/><polygon points=\"5.65,4.80 5.76,5.15 6.13,5.15 5.83,5.36 5.94,5.70 5.65,5.49 5.36,5.70 5.47,5.36 5.17,5.15 5.54,5.15\" fill=\"#fff\"/><polygon points=\"7.35,4.80 7.46,5.15 7.83,5.15 7.53,5.36 7.64,5.70 7.35,5.49 7.06,5.70 7.17,5.36 6.87,5.15 7.24,5.15\" fill=\"#fff\"/><polygon points=\"1.40,6.20 1.51,6.55 1.88,6.55 1.58,6.76 1.69,7.10 1.40,6.89 1.11,7.10 1.22,6.76 0.92,6.55 1.29,6.55\" fill=\"#fff\"/><polygon points=\"3.10,6.20 3.21,6.55 3.58,6.55 3.28,6.76 3.39,7.10 3.10,6.89 2.81,7.10 2.92,6.76 2.62,6.55 2.99,6.55\" fill=\"#fff\"/><polygon points=\"4.80,6.20 4.91,6.55 5.28,6.55 4.98,6.76 5.09,7.10 4.80,6.89 4.51,7.10 4.62,6.76 4.32,6.55 4.69,6.55\" fill=\"#fff\"/><polygon points=\"6.50,6.20 6.61,6.55 6.98,6.55 6.68,6.76 6.79,7.10 6.50,6.89 6.21,7.10 6.32,6.76 6.02,6.55 6.39,6.55\" fill=\"#fff\"/><polygon points=\"8.20,6.20 8.31,6.55 8.68,6.55 8.38,6.76 8.49,7.10 8.20,6.89 7.91,7.10 8.02,6.76 7.72,6.55 8.09,6.55\" fill=\"#fff\"/>",
+"Australia":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#00247d\"/><svg x=\"0\" y=\"0\" width=\"12\" height=\"8\" viewBox=\"0 0 60 30\" preserveAspectRatio=\"none\"><rect width=\"60\" height=\"30\" fill=\"#012169\"/><path d=\"M0,0 60,30 M60,0 0,30\" stroke=\"#fff\" stroke-width=\"6\"/><path d=\"M0,0 60,30 M60,0 0,30\" stroke=\"#C8102E\" stroke-width=\"3\"/><path d=\"M30,0 V30 M0,15 H60\" stroke=\"#fff\" stroke-width=\"10\"/><path d=\"M30,0 V30 M0,15 H60\" stroke=\"#C8102E\" stroke-width=\"6\"/></svg><polygon points=\"6.00,10.80 6.38,11.97 7.62,11.97 6.62,12.70 7.00,13.88 6.00,13.15 5.00,13.88 5.38,12.70 4.38,11.97 5.62,11.97\" fill=\"#fff\"/><polygon points=\"20.00,2.00 20.22,2.69 20.95,2.69 20.36,3.12 20.59,3.81 20.00,3.38 19.41,3.81 19.64,3.12 19.05,2.69 19.78,2.69\" fill=\"#fff\"/><polygon points=\"22.00,6.20 22.18,6.75 22.76,6.75 22.29,7.09 22.47,7.65 22.00,7.31 21.53,7.65 21.71,7.09 21.24,6.75 21.82,6.75\" fill=\"#fff\"/><polygon points=\"19.00,8.60 19.20,9.22 19.86,9.22 19.33,9.61 19.53,10.23 19.00,9.84 18.47,10.23 18.67,9.61 18.14,9.22 18.80,9.22\" fill=\"#fff\"/><polygon points=\"21.50,10.70 21.68,11.25 22.26,11.25 21.79,11.59 21.97,12.15 21.50,11.81 21.03,12.15 21.21,11.59 20.74,11.25 21.32,11.25\" fill=\"#fff\"/><polygon points=\"20.40,6.80 20.49,7.08 20.78,7.08 20.55,7.25 20.64,7.52 20.40,7.35 20.16,7.52 20.25,7.25 20.02,7.08 20.31,7.08\" fill=\"#fff\"/>",
+"Türkiye":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#e30a17\"/><circle cx=\"9.5\" cy=\"8\" r=\"3.6\" fill=\"#fff\"/><circle cx=\"10.8\" cy=\"8\" r=\"2.9\" fill=\"#e30a17\"/><polygon points=\"13.51,6.48 14.19,7.42 15.29,7.06 14.61,8.00 15.29,8.94 14.19,8.58 13.51,9.52 13.51,8.36 12.40,8.00 13.51,7.64\" fill=\"#fff\"/>",
+"Paraguay":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"5.333\" fill=\"#d52b1e\"/><rect x=\"0\" y=\"5.333\" width=\"24\" height=\"5.334\" fill=\"#fff\"/><rect x=\"0\" y=\"10.667\" width=\"24\" height=\"5.333\" fill=\"#0038a8\"/><circle cx=\"12\" cy=\"8\" r=\"1.7\" fill=\"#fff\" stroke=\"#0038a8\" stroke-width=\"0.3\"/><polygon points=\"12.00,7.10 12.20,7.72 12.86,7.72 12.33,8.11 12.53,8.73 12.00,8.34 11.47,8.73 11.67,8.11 11.14,7.72 11.80,7.72\" fill=\"#ffce00\"/>",
+"Germany":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#000\"/><rect x=\"0\" y=\"5.333\" width=\"24\" height=\"5.334\" fill=\"#dd0000\"/><rect x=\"0\" y=\"10.667\" width=\"24\" height=\"5.333\" fill=\"#ffce00\"/>",
+"Ivory Coast":"<rect x=\"0\" y=\"0\" width=\"8\" height=\"16\" fill=\"#f77f00\"/><rect x=\"8\" y=\"0\" width=\"8\" height=\"16\" fill=\"#fff\"/><rect x=\"16\" y=\"0\" width=\"8\" height=\"16\" fill=\"#009e60\"/>",
+"Ecuador":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"8\" fill=\"#ffdd00\"/><rect x=\"0\" y=\"8\" width=\"24\" height=\"4\" fill=\"#034ea2\"/><rect x=\"0\" y=\"12\" width=\"24\" height=\"4\" fill=\"#ed1c24\"/><circle cx=\"12\" cy=\"8\" r=\"1.6\" fill=\"#7b3f00\"/>",
+"Curaçao":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#002b7f\"/><rect x=\"0\" y=\"11\" width=\"24\" height=\"2.4\" fill=\"#f9d90f\"/><polygon points=\"5.00,2.60 5.31,3.57 6.33,3.57 5.51,4.17 5.82,5.13 5.00,4.53 4.18,5.13 4.49,4.17 3.67,3.57 4.69,3.57\" fill=\"#fff\"/><polygon points=\"7.60,5.00 7.82,5.69 8.55,5.69 7.96,6.12 8.19,6.81 7.60,6.38 7.01,6.81 7.24,6.12 6.65,5.69 7.38,5.69\" fill=\"#fff\"/>",
+"Sweden":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#006aa7\"/><rect x=\"7\" y=\"0\" width=\"3\" height=\"16\" fill=\"#fecc00\"/><rect x=\"0\" y=\"6.5\" width=\"24\" height=\"3\" fill=\"#fecc00\"/>",
+"Japan":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#fff\"/><circle cx=\"12\" cy=\"8\" r=\"4.2\" fill=\"#bc002d\"/>",
+"Netherlands":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#ae1c28\"/><rect x=\"0\" y=\"5.333\" width=\"24\" height=\"5.334\" fill=\"#fff\"/><rect x=\"0\" y=\"10.667\" width=\"24\" height=\"5.333\" fill=\"#21468b\"/>",
+"Tunisia":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#e70013\"/><circle cx=\"12\" cy=\"8\" r=\"3.4\" fill=\"#fff\"/><circle cx=\"11.7\" cy=\"8\" r=\"2.3\" fill=\"#e70013\"/><circle cx=\"12.7\" cy=\"8\" r=\"1.9\" fill=\"#fff\"/><polygon points=\"13.30,6.95 13.54,7.68 14.30,7.68 13.68,8.12 13.92,8.85 13.30,8.40 12.68,8.85 12.92,8.12 12.30,7.68 13.06,7.68\" fill=\"#e70013\"/>",
+"Belgium":"<rect x=\"0\" y=\"0\" width=\"8\" height=\"16\" fill=\"#000\"/><rect x=\"8\" y=\"0\" width=\"8\" height=\"16\" fill=\"#fae042\"/><rect x=\"16\" y=\"0\" width=\"8\" height=\"16\" fill=\"#ed2939\"/>",
+"Egypt":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#ce1126\"/><rect x=\"0\" y=\"5.333\" width=\"24\" height=\"5.334\" fill=\"#fff\"/><rect x=\"0\" y=\"10.667\" width=\"24\" height=\"5.333\" fill=\"#000\"/><circle cx=\"12\" cy=\"8\" r=\"1.4\" fill=\"#c09300\"/>",
+"Iran":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#239f40\"/><rect x=\"0\" y=\"5.333\" width=\"24\" height=\"5.334\" fill=\"#fff\"/><rect x=\"0\" y=\"10.667\" width=\"24\" height=\"5.333\" fill=\"#da0000\"/><circle cx=\"12\" cy=\"8\" r=\"1.0\" fill=\"#da0000\"/>",
+"New Zealand":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#00247d\"/><svg x=\"0\" y=\"0\" width=\"12\" height=\"8\" viewBox=\"0 0 60 30\" preserveAspectRatio=\"none\"><rect width=\"60\" height=\"30\" fill=\"#012169\"/><path d=\"M0,0 60,30 M60,0 0,30\" stroke=\"#fff\" stroke-width=\"6\"/><path d=\"M0,0 60,30 M60,0 0,30\" stroke=\"#C8102E\" stroke-width=\"3\"/><path d=\"M30,0 V30 M0,15 H60\" stroke=\"#fff\" stroke-width=\"10\"/><path d=\"M30,0 V30 M0,15 H60\" stroke=\"#C8102E\" stroke-width=\"6\"/></svg><polygon points=\"20.00,2.55 20.33,3.55 21.38,3.55 20.53,4.17 20.85,5.17 20.00,4.55 19.15,5.17 19.47,4.17 18.62,3.55 19.67,3.55\" fill=\"#fff\"/><polygon points=\"20.00,2.90 20.25,3.66 21.05,3.66 20.40,4.13 20.65,4.89 20.00,4.42 19.35,4.89 19.60,4.13 18.95,3.66 19.75,3.66\" fill=\"#cc142b\"/><polygon points=\"22.00,6.70 22.29,7.60 23.24,7.60 22.47,8.15 22.76,9.05 22.00,8.50 21.24,9.05 21.53,8.15 20.76,7.60 21.71,7.60\" fill=\"#fff\"/><polygon points=\"22.00,7.05 22.21,7.71 22.90,7.71 22.35,8.11 22.56,8.77 22.00,8.36 21.44,8.77 21.65,8.11 21.10,7.71 21.79,7.71\" fill=\"#cc142b\"/><polygon points=\"19.00,8.65 19.30,9.58 20.28,9.58 19.49,10.16 19.79,11.09 19.00,10.52 18.21,11.09 18.51,10.16 17.72,9.58 18.70,9.58\" fill=\"#fff\"/><polygon points=\"19.00,9.00 19.22,9.69 19.95,9.69 19.36,10.12 19.59,10.81 19.00,10.38 18.41,10.81 18.64,10.12 18.05,9.69 18.78,9.69\" fill=\"#cc142b\"/><polygon points=\"21.00,11.20 21.29,12.10 22.24,12.10 21.47,12.65 21.76,13.55 21.00,13.00 20.24,13.55 20.53,12.65 19.76,12.10 20.71,12.10\" fill=\"#fff\"/><polygon points=\"21.00,11.55 21.21,12.21 21.90,12.21 21.35,12.61 21.56,13.27 21.00,12.86 20.44,13.27 20.65,12.61 20.10,12.21 20.79,12.21\" fill=\"#cc142b\"/>",
+"Spain":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"4\" fill=\"#aa151b\"/><rect x=\"0\" y=\"4\" width=\"24\" height=\"8\" fill=\"#f1bf00\"/><rect x=\"0\" y=\"12\" width=\"24\" height=\"4\" fill=\"#aa151b\"/><rect x=\"4.6\" y=\"6.2\" width=\"2.4\" height=\"3.6\" fill=\"#ad1519\"/><rect x=\"5.1\" y=\"6.7\" width=\"1.4\" height=\"2.6\" fill=\"#f1bf00\"/>",
+"Uruguay":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#fff\"/><rect x=\"0\" y=\"1.7777777777777777\" width=\"24\" height=\"1.7777777777777777\" fill=\"#0038a8\"/><rect x=\"0\" y=\"5.333333333333333\" width=\"24\" height=\"1.7777777777777777\" fill=\"#0038a8\"/><rect x=\"0\" y=\"8.88888888888889\" width=\"24\" height=\"1.7777777777777777\" fill=\"#0038a8\"/><rect x=\"0\" y=\"12.444444444444445\" width=\"24\" height=\"1.7777777777777777\" fill=\"#0038a8\"/><rect x=\"0\" y=\"0\" width=\"9.6\" height=\"8.88888888888889\" fill=\"#fff\"/><circle cx=\"4.8\" cy=\"4.4\" r=\"1.7\" fill=\"#fcd116\"/><polygon points=\"4.80,2.70 5.18,3.87 6.42,3.87 5.42,4.60 5.80,5.78 4.80,5.05 3.80,5.78 4.18,4.60 3.18,3.87 4.42,3.87\" fill=\"#fcd116\"/>",
+"Saudi Arabia":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#006c35\"/><rect x=\"4\" y=\"9.4\" width=\"16\" height=\"1.0\" fill=\"#fff\"/><rect x=\"5.5\" y=\"6\" width=\"1.6\" height=\"1.5\" fill=\"#fff\"/><rect x=\"8\" y=\"6\" width=\"1.6\" height=\"1.5\" fill=\"#fff\"/><rect x=\"10.5\" y=\"6\" width=\"1.6\" height=\"1.5\" fill=\"#fff\"/><rect x=\"13\" y=\"6\" width=\"1.6\" height=\"1.5\" fill=\"#fff\"/><rect x=\"15.5\" y=\"6\" width=\"1.6\" height=\"1.5\" fill=\"#fff\"/><rect x=\"18\" y=\"6\" width=\"1.6\" height=\"1.5\" fill=\"#fff\"/>",
+"Cape Verde":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#003893\"/><rect x=\"0\" y=\"9\" width=\"24\" height=\"1.4\" fill=\"#fff\"/><rect x=\"0\" y=\"10.4\" width=\"24\" height=\"1.4\" fill=\"#cf2027\"/><rect x=\"0\" y=\"11.8\" width=\"24\" height=\"1.4\" fill=\"#fff\"/><polygon points=\"9.50,3.70 9.66,4.18 10.17,4.18 9.75,4.48 9.91,4.97 9.50,4.67 9.09,4.97 9.25,4.48 8.83,4.18 9.34,4.18\" fill=\"#f7d116\"/><polygon points=\"11.38,4.31 11.54,4.79 12.05,4.79 11.64,5.09 11.79,5.58 11.38,5.28 10.97,5.58 11.13,5.09 10.72,4.79 11.22,4.79\" fill=\"#f7d116\"/><polygon points=\"12.54,5.91 12.70,6.39 13.21,6.39 12.80,6.69 12.95,7.18 12.54,6.88 12.13,7.18 12.29,6.69 11.88,6.39 12.39,6.39\" fill=\"#f7d116\"/><polygon points=\"12.54,7.89 12.70,8.37 13.21,8.37 12.80,8.67 12.95,9.16 12.54,8.86 12.13,9.16 12.29,8.67 11.88,8.37 12.39,8.37\" fill=\"#f7d116\"/><polygon points=\"11.38,9.49 11.54,9.97 12.05,9.97 11.64,10.27 11.79,10.76 11.38,10.46 10.97,10.76 11.13,10.27 10.72,9.97 11.22,9.97\" fill=\"#f7d116\"/><polygon points=\"9.50,10.10 9.66,10.58 10.17,10.58 9.75,10.88 9.91,11.37 9.50,11.07 9.09,11.37 9.25,10.88 8.83,10.58 9.34,10.58\" fill=\"#f7d116\"/><polygon points=\"7.62,9.49 7.78,9.97 8.28,9.97 7.87,10.27 8.03,10.76 7.62,10.46 7.21,10.76 7.36,10.27 6.95,9.97 7.46,9.97\" fill=\"#f7d116\"/><polygon points=\"6.46,7.89 6.61,8.37 7.12,8.37 6.71,8.67 6.87,9.16 6.46,8.86 6.05,9.16 6.20,8.67 5.79,8.37 6.30,8.37\" fill=\"#f7d116\"/><polygon points=\"6.46,5.91 6.61,6.39 7.12,6.39 6.71,6.69 6.87,7.18 6.46,6.88 6.05,7.18 6.20,6.69 5.79,6.39 6.30,6.39\" fill=\"#f7d116\"/><polygon points=\"7.62,4.31 7.78,4.79 8.28,4.79 7.87,5.09 8.03,5.58 7.62,5.28 7.21,5.58 7.36,5.09 6.95,4.79 7.46,4.79\" fill=\"#f7d116\"/>",
+"France":"<rect x=\"0\" y=\"0\" width=\"8\" height=\"16\" fill=\"#0055a4\"/><rect x=\"8\" y=\"0\" width=\"8\" height=\"16\" fill=\"#fff\"/><rect x=\"16\" y=\"0\" width=\"8\" height=\"16\" fill=\"#ef4135\"/>",
+"Senegal":"<rect x=\"0\" y=\"0\" width=\"8\" height=\"16\" fill=\"#00853f\"/><rect x=\"8\" y=\"0\" width=\"8\" height=\"16\" fill=\"#fdef42\"/><rect x=\"16\" y=\"0\" width=\"8\" height=\"16\" fill=\"#e31b23\"/><polygon points=\"12.00,6.00 12.45,7.38 13.90,7.38 12.73,8.24 13.18,9.62 12.00,8.76 10.82,9.62 11.27,8.24 10.10,7.38 11.55,7.38\" fill=\"#00853f\"/>",
+"Norway":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#ba0c2f\"/><rect x=\"6\" y=\"0\" width=\"5\" height=\"16\" fill=\"#fff\"/><rect x=\"0\" y=\"5.5\" width=\"24\" height=\"5\" fill=\"#fff\"/><rect x=\"7.3\" y=\"0\" width=\"2.4\" height=\"16\" fill=\"#00205b\"/><rect x=\"0\" y=\"6.8\" width=\"24\" height=\"2.4\" fill=\"#00205b\"/>",
+"Iraq":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#ce1126\"/><rect x=\"0\" y=\"5.333\" width=\"24\" height=\"5.334\" fill=\"#fff\"/><rect x=\"0\" y=\"10.667\" width=\"24\" height=\"5.333\" fill=\"#000\"/><rect x=\"8.5\" y=\"7.1\" width=\"1.6\" height=\"1.8\" fill=\"#007a3d\"/><rect x=\"11\" y=\"7.1\" width=\"1.6\" height=\"1.8\" fill=\"#007a3d\"/><rect x=\"13.5\" y=\"7.1\" width=\"1.6\" height=\"1.8\" fill=\"#007a3d\"/>",
+"Argentina":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#74acdf\"/><rect x=\"0\" y=\"5.333\" width=\"24\" height=\"5.334\" fill=\"#fff\"/><rect x=\"0\" y=\"10.667\" width=\"24\" height=\"5.333\" fill=\"#74acdf\"/><circle cx=\"12\" cy=\"8\" r=\"1.5\" fill=\"#f6b40e\"/><polygon points=\"12.00,6.50 12.34,7.54 13.43,7.54 12.54,8.18 12.88,9.21 12.00,8.57 11.12,9.21 11.46,8.18 10.57,7.54 11.66,7.54\" fill=\"#f6b40e\"/>",
+"Austria":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#ed2939\"/><rect x=\"0\" y=\"5.333\" width=\"24\" height=\"5.334\" fill=\"#fff\"/><rect x=\"0\" y=\"10.667\" width=\"24\" height=\"5.333\" fill=\"#ed2939\"/>",
+"Algeria":"<rect x=\"0\" y=\"0\" width=\"12\" height=\"16\" fill=\"#006233\"/><rect x=\"12\" y=\"0\" width=\"12\" height=\"16\" fill=\"#fff\"/><circle cx=\"11.4\" cy=\"8\" r=\"2.7\" fill=\"#d21034\"/><circle cx=\"12.4\" cy=\"8\" r=\"2.1\" fill=\"#fff\"/><polygon points=\"13.20,6.90 13.45,7.66 14.25,7.66 13.60,8.13 13.85,8.89 13.20,8.42 12.55,8.89 12.80,8.13 12.15,7.66 12.95,7.66\" fill=\"#d21034\"/>",
+"Jordan":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#000\"/><rect x=\"0\" y=\"5.333\" width=\"24\" height=\"5.334\" fill=\"#fff\"/><rect x=\"0\" y=\"10.667\" width=\"24\" height=\"5.333\" fill=\"#007a3d\"/><polygon points=\"0,0 11,8 0,16\" fill=\"#ce1126\"/><polygon points=\"4.00,6.90 4.25,7.66 5.05,7.66 4.40,8.13 4.65,8.89 4.00,8.42 3.35,8.89 3.60,8.13 2.95,7.66 3.75,7.66\" fill=\"#fff\"/>",
+"Portugal":"<rect x=\"0\" y=\"0\" width=\"9.6\" height=\"16\" fill=\"#006600\"/><rect x=\"9.6\" y=\"0\" width=\"14.4\" height=\"16\" fill=\"#ff0000\"/><circle cx=\"9.6\" cy=\"8\" r=\"2.7\" fill=\"none\" stroke=\"#ffe000\" stroke-width=\"0.7\"/><rect x=\"8.6\" y=\"5.4\" width=\"2\" height=\"3.2\" fill=\"#fff\"/><rect x=\"8.9\" y=\"5.8\" width=\"1.4\" height=\"2.4\" fill=\"#002776\"/>",
+"Colombia":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"8\" fill=\"#fcd116\"/><rect x=\"0\" y=\"8\" width=\"24\" height=\"4\" fill=\"#003893\"/><rect x=\"0\" y=\"12\" width=\"24\" height=\"4\" fill=\"#ce1126\"/>",
+"Uzbekistan":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"5.1\" fill=\"#0099b5\"/><rect x=\"0\" y=\"5.5\" width=\"24\" height=\"5\" fill=\"#fff\"/><rect x=\"0\" y=\"10.9\" width=\"24\" height=\"5.1\" fill=\"#1eb53a\"/><rect x=\"0\" y=\"5.1\" width=\"24\" height=\"0.4\" fill=\"#ce2939\"/><rect x=\"0\" y=\"10.5\" width=\"24\" height=\"0.4\" fill=\"#ce2939\"/><circle cx=\"4.6\" cy=\"2.6\" r=\"1.6\" fill=\"#fff\"/><circle cx=\"5.4\" cy=\"2.6\" r=\"1.3\" fill=\"#0099b5\"/><polygon points=\"7.00,1.20 7.09,1.48 7.38,1.48 7.15,1.65 7.24,1.92 7.00,1.75 6.76,1.92 6.85,1.65 6.62,1.48 6.91,1.48\" fill=\"#fff\"/><polygon points=\"8.40,1.20 8.49,1.48 8.78,1.48 8.55,1.65 8.64,1.92 8.40,1.75 8.16,1.92 8.25,1.65 8.02,1.48 8.31,1.48\" fill=\"#fff\"/><polygon points=\"7.00,2.60 7.09,2.88 7.38,2.88 7.15,3.05 7.24,3.32 7.00,3.15 6.76,3.32 6.85,3.05 6.62,2.88 6.91,2.88\" fill=\"#fff\"/><polygon points=\"8.40,2.60 8.49,2.88 8.78,2.88 8.55,3.05 8.64,3.32 8.40,3.15 8.16,3.32 8.25,3.05 8.02,2.88 8.31,2.88\" fill=\"#fff\"/>",
+"DR Congo":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#007fff\"/><line x1=\"2\" y1=\"15\" x2=\"22\" y2=\"2\" stroke=\"#f7d618\" stroke-width=\"3.6\"/><line x1=\"2\" y1=\"15\" x2=\"22\" y2=\"2\" stroke=\"#ce1021\" stroke-width=\"2\"/><polygon points=\"4.50,2.20 4.90,3.44 6.21,3.44 5.15,4.21 5.56,5.46 4.50,4.69 3.44,5.46 3.85,4.21 2.79,3.44 4.10,3.44\" fill=\"#f7d618\"/>",
+"England":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#fff\"/><rect x=\"10\" y=\"0\" width=\"4\" height=\"16\" fill=\"#ce1124\"/><rect x=\"0\" y=\"6\" width=\"24\" height=\"4\" fill=\"#ce1124\"/>",
+"Croatia":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#ff0000\"/><rect x=\"0\" y=\"5.333\" width=\"24\" height=\"5.334\" fill=\"#fff\"/><rect x=\"0\" y=\"10.667\" width=\"24\" height=\"5.333\" fill=\"#171796\"/><rect x=\"10\" y=\"5.5\" width=\"4\" height=\"5\" fill=\"#fff\"/><rect x=\"10.0\" y=\"5.5\" width=\"1.0\" height=\"1.25\" fill=\"#ff0000\"/><rect x=\"12.0\" y=\"5.5\" width=\"1.0\" height=\"1.25\" fill=\"#ff0000\"/><rect x=\"11.0\" y=\"6.75\" width=\"1.0\" height=\"1.25\" fill=\"#ff0000\"/><rect x=\"13.0\" y=\"6.75\" width=\"1.0\" height=\"1.25\" fill=\"#ff0000\"/><rect x=\"10.0\" y=\"8.0\" width=\"1.0\" height=\"1.25\" fill=\"#ff0000\"/><rect x=\"12.0\" y=\"8.0\" width=\"1.0\" height=\"1.25\" fill=\"#ff0000\"/><rect x=\"11.0\" y=\"9.25\" width=\"1.0\" height=\"1.25\" fill=\"#ff0000\"/><rect x=\"13.0\" y=\"9.25\" width=\"1.0\" height=\"1.25\" fill=\"#ff0000\"/>",
+"Ghana":"<rect x=\"0\" y=\"0\" width=\"24\" height=\"16\" fill=\"#ce1126\"/><rect x=\"0\" y=\"5.333\" width=\"24\" height=\"5.334\" fill=\"#fcd116\"/><rect x=\"0\" y=\"10.667\" width=\"24\" height=\"5.333\" fill=\"#006b3f\"/><polygon points=\"12.00,6.10 12.43,7.41 13.81,7.41 12.69,8.22 13.12,9.54 12.00,8.73 10.88,9.54 11.31,8.22 10.19,7.41 11.57,7.41\" fill=\"#000\"/>",
+"Panama":"<rect x=\"0\" y=\"0\" width=\"12\" height=\"8\" fill=\"#fff\"/><rect x=\"12\" y=\"0\" width=\"12\" height=\"8\" fill=\"#da121a\"/><rect x=\"0\" y=\"8\" width=\"12\" height=\"8\" fill=\"#072357\"/><rect x=\"12\" y=\"8\" width=\"12\" height=\"8\" fill=\"#fff\"/><polygon points=\"6.00,2.20 6.40,3.44 7.71,3.44 6.65,4.21 7.06,5.46 6.00,4.69 4.94,5.46 5.35,4.21 4.29,3.44 5.60,3.44\" fill=\"#072357\"/><polygon points=\"18.00,10.20 18.40,11.44 19.71,11.44 18.65,12.21 19.06,13.46 18.00,12.69 16.94,13.46 17.35,12.21 16.29,11.44 17.60,11.44\" fill=\"#da121a\"/>"
+};
+function flagNode(team){
+  const wrap=document.createElement('span');wrap.className='flag';
+  const svg=SVGFLAGS[team?team.trim():''];
+  if(!svg){wrap.textContent=flagFor(team);wrap.classList.add('code');return wrap;}
+  wrap.innerHTML='<svg class="flagimg" viewBox="0 0 24 16" preserveAspectRatio="xMidYMid meet">'+svg+'</svg>';
+  return wrap;
+}
+function paintTeam(span,t,ph){
+  span.classList.remove('empty');span.innerHTML='';
+  if(!t){span.textContent=ph;span.classList.add('empty');return;}
+  span.appendChild(flagNode(t));
+  const tn=document.createElement('span');tn.className='tn';tn.textContent=t;span.appendChild(tn);
+}
 
 const MATCHES={
   M73:{code:'M73',a:'2A',b:'2B',dest:{m:'M90',s:'a'}},
@@ -301,9 +374,9 @@ function renderGroups(){
     state.groups[g].forEach((team,i)=>{
       const row=document.createElement('div');row.className='row '+(i<2?'q':(i===2?'third':'out'));
       const pos=document.createElement('span');pos.className='pos';pos.textContent=(i+1);row.appendChild(pos);
-      const flag=document.createElement('span');flag.className='flag';flag.textContent=flagFor(team);row.appendChild(flag);
+      let flag=flagNode(team);row.appendChild(flag);
       const inp=document.createElement('input');inp.className='team';inp.type='text';inp.value=team;inp.spellcheck=false;inp.autocomplete='off';
-      inp.addEventListener('input',()=>{state.groups[g][i]=inp.value;flag.textContent=flagFor(inp.value);rebuild();save();});
+      inp.addEventListener('input',()=>{state.groups[g][i]=inp.value;const nf=flagNode(inp.value);flag.replaceWith(nf);flag=nf;rebuild();save();});
       row.appendChild(inp);
       if(i===2){const q=document.createElement('button');q.type='button';q.className='qual'+(state.thirdQual[g]?' on':'');q.textContent=state.thirdQual[g]?'✓ 3rd':'+ 3rd';q.title='Mark as a best-third qualifier';
         q.addEventListener('click',()=>{if(state.thirdQual[g]){delete state.thirdQual[g];}else{if(selectedThirds().length>=8){pulseCounter();return;}state.thirdQual[g]=true;}renderGroups();rebuild();save();});
@@ -385,7 +458,7 @@ function rebuild(){
     if(p.type==='seed'||p.type==='third'){
       const span=document.querySelector('[data-disp="'+key+'"]');if(!span)return;
       const t=valueOf(mid,s);
-      if(t){span.textContent=withFlag(t);span.classList.remove('empty');}else{span.textContent=slotPH(mid,s);span.classList.add('empty');}
+      paintTeam(span,t,slotPH(mid,s));
     }
   }));
   // winner dropdowns, upstream first
@@ -398,7 +471,7 @@ function rebuild(){
   const csel=document.getElementById('champSelect');
   if(csel)fillSelect(csel,'CHAMP',[valueOf('M104','a'),valueOf('M104','b')],'Pick the winner',state.picks);
   // 3rd place losers (display)
-  ['a','b'].forEach(s=>{const span=document.querySelector('[data-disp="M103.'+s+'"]');if(!span)return;const t=valueOf('M103',s);if(t){span.textContent=withFlag(t);span.classList.remove('empty');}else{span.textContent=slotPH('M103',s);span.classList.add('empty');}});
+  ['a','b'].forEach(s=>{const span=document.querySelector('[data-disp="M103.'+s+'"]');if(!span)return;paintTeam(span,valueOf('M103',s),slotPH('M103',s));});
   // highlight winners
   Object.keys(MATCHES).forEach(mid=>{
     const box=document.getElementById('match-'+mid);if(!box)return;

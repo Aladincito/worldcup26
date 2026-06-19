@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Cup 2026 — Group + Bracket Predictor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0A1E29;--ink-2:#0E2733;--panel:#123141;--panel-2:#163A4C;
+    --line:#1F4F61;--line-soft:#19404f;--text:#EAF4F2;--muted:#7FA8B0;
+    --muted-2:#5C8590;--gold:#E8B84B;--gold-deep:#C9982F;--mint:#3FD8A4;--amber:#E0913C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, #14394a 0%, rgba(20,57,74,0) 60%),
+      radial-gradient(900px 500px at -5% 110%, #10303f 0%, rgba(16,48,63,0) 55%),
+      var(--ink);
+    color:var(--text);font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;min-height:100vh;
+  }
+  header{padding:22px 20px 14px;border-bottom:1px solid var(--line-soft);}
+  .eyebrow{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin:0 0 6px;}
+  h1{font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:clamp(26px,6vw,42px);line-height:.98;margin:0;}
+  h1 .thin{color:var(--muted);font-weight:400;}
+  .sub{color:var(--muted);font-size:13px;margin:8px 0 0;max-width:660px;line-height:1.45;}
+  .toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;}
+  .status{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--muted-2);margin-right:auto;}
+  .status .dot{color:var(--mint);}
+  button.btn{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:12px;font-weight:600;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:9px 14px;cursor:pointer;transition:background .15s,border-color .15s;}
+  button.btn:hover{background:var(--panel-2);border-color:var(--gold-deep);}
+  button.btn.ghost{background:transparent;}
+
+  .section-label{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.18em;font-size:13px;font-weight:600;color:var(--text);padding:20px 20px 0;display:flex;align-items:baseline;gap:10px;}
+  .section-label .hint{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.04em;color:var(--muted-2);text-transform:none;}
+
+  .groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:12px;padding:12px 20px 4px;}
+  .group{background:linear-gradient(180deg,var(--panel) 0%,var(--ink-2) 100%);border:1px solid var(--line-soft);border-radius:10px;padding:9px 9px 7px;}
+  .group h3{font-family:'Oswald',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:13px;margin:0 0 8px;color:var(--text);display:flex;align-items:center;gap:7px;}
+  .group h3 .tag{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted-2);letter-spacing:.04em;font-weight:400;text-transform:none;margin-left:auto;}
+  .row{display:flex;align-items:center;gap:6px;background:var(--ink);border:1px solid transparent;border-left:3px solid var(--line);border-radius:6px;padding:3px 5px;margin:4px 0;}
+  .row.q{border-left-color:var(--mint);}
+  .row.third{border-left-color:var(--amber);}
+  .row.out{border-left-color:var(--muted-2);opacity:.72;}
+  .pos{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;width:14px;text-align:center;color:var(--muted);}
+  .flag{flex:none;width:22px;text-align:center;font-size:15px;line-height:1;}
+  .row.q .pos{color:var(--mint);}
+  .row.third .pos{color:var(--amber);}
+  .row input.team{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:5px 0;}
+  .arrows{display:flex;flex-direction:column;gap:1px;}
+  .arrows button{width:20px;height:14px;line-height:1;padding:0;border:none;background:transparent;color:var(--muted-2);cursor:pointer;font-size:10px;border-radius:3px;}
+  .arrows button:hover:not(:disabled){color:var(--gold);background:rgba(232,184,75,.12);}
+  .arrows button:disabled{opacity:.25;cursor:default;}
+  .glegend{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted-2);padding:2px 20px 4px;letter-spacing:.03em;}
+  .glegend b{color:var(--mint);font-weight:400;}
+  .glegend i{color:var(--amber);font-style:normal;}
+  .counter{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);padding:0 20px 6px;letter-spacing:.03em;}
+  .counter.done{color:var(--mint);}
+  .counter.pulse{animation:cpulse .45s ease;}
+  @keyframes cpulse{0%{color:var(--amber);transform:translateX(0);}25%{transform:translateX(2px);}50%{transform:translateX(-2px);}100%{}}
+  .qual{flex:none;border:1px solid var(--line);background:transparent;color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.04em;border-radius:5px;padding:3px 6px;cursor:pointer;white-space:nowrap;}
+  .qual:hover{border-color:var(--amber);color:var(--amber);}
+  .qual.on{background:rgba(224,145,60,.18);border-color:var(--amber);color:var(--amber);font-weight:700;}
+
+  .scroll-hint{display:none;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted-2);padding:10px 20px 0;}
+  @media(max-width:760px){.scroll-hint{display:block;}}
+
+  .board-wrap{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:14px 20px 40px;}
+  .board{display:flex;gap:18px;align-items:stretch;min-width:max-content;}
+  .col{display:flex;flex-direction:column;justify-content:space-around;min-width:186px;width:186px;}
+  .col.final-col{min-width:208px;width:208px;justify-content:center;}
+  .col-head{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.14em;font-size:12px;font-weight:600;color:var(--muted);padding-bottom:4px;margin-bottom:10px;border-bottom:1px solid var(--line-soft);position:sticky;top:0;text-align:center;}
+  .col-head .n{color:var(--gold);font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.05em;}
+
+  .match{background:linear-gradient(180deg,var(--panel) 0%,var(--ink-2) 100%);border:1px solid var(--line-soft);border-radius:9px;margin:9px 0;padding:6px;}
+  .match .code{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:var(--muted-2);text-align:center;margin:0 0 5px;text-transform:uppercase;}
+  .slot{display:flex;align-items:center;gap:4px;background:var(--ink);border:1px solid transparent;border-radius:6px;padding:2px 8px;margin:3px 0;transition:border-color .15s,background .15s;}
+  .slot:focus-within{border-color:var(--line);}
+  .slot select,.slot input{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;padding:6px 0;cursor:pointer;}
+  .slot select option{background:var(--ink-2);color:var(--text);}
+  .slot select:invalid,.slot select.placeholder{color:var(--muted-2);font-family:'Space Mono',monospace;font-size:11px;}
+  .seed-team{flex:1;min-width:0;padding:6px 0;font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .seed-team.empty{color:var(--muted-2);font-family:'Space Mono',monospace;font-size:11px;font-weight:400;letter-spacing:.02em;}
+  .slot.won{background:linear-gradient(90deg,rgba(63,216,164,.16),rgba(63,216,164,.04));border-color:rgba(63,216,164,.45);}
+  .slot.won .seed-team,.slot.won select{font-weight:700;}
+  .slot.lost{opacity:.42;}
+
+  .final-block{display:flex;flex-direction:column;gap:14px;align-items:center;}
+  .match.final{width:100%;border-color:var(--gold-deep);background:linear-gradient(180deg,#15384a 0%,#0c2330 100%);box-shadow:0 0 0 1px rgba(232,184,75,.18),0 14px 40px -18px rgba(232,184,75,.5);}
+  .match.final .code{color:var(--gold);}
+  .champion{width:100%;border:1px solid var(--gold-deep);border-radius:11px;background:radial-gradient(120% 140% at 50% 0%, rgba(232,184,75,.18) 0%, rgba(232,184,75,0) 60%),linear-gradient(180deg,#13313f,#0a1f29);padding:16px 12px;text-align:center;}
+  .champion .trophy{font-size:26px;line-height:1;filter:drop-shadow(0 4px 10px rgba(232,184,75,.4));}
+  .champion .lbl{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.22em;font-size:10px;color:var(--gold);margin:8px 0 6px;}
+  .champ-select{width:100%;background:var(--ink);border:1px solid var(--gold-deep);border-radius:7px;color:var(--gold);font-family:'Oswald',sans-serif;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.04em;padding:9px 8px;text-align:center;text-align-last:center;cursor:pointer;}
+  .champ-select option{background:var(--ink-2);color:var(--text);font-family:'Inter',sans-serif;text-transform:none;letter-spacing:0;}
+  .third-pp{width:100%;border:1px dashed var(--line);border-radius:9px;padding:6px;background:rgba(18,49,65,.5);}
+  .third-pp .code{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:var(--muted-2);text-align:center;margin:0 0 5px;text-transform:uppercase;}
+  footer{color:var(--muted-2);font-size:11px;padding:0 20px 30px;line-height:1.5;font-family:'Space Mono',monospace;letter-spacing:.02em;}
+
+  @media print{
+    @page{size:landscape;margin:9mm;}
+    body{background:#fff!important;color:#0b1f2a!important;}
+    header{padding:0 0 6px;border-bottom:1px solid #ccc;}
+    .eyebrow{color:#9a7a1e;margin-bottom:2px;}
+    h1{color:#0b1f2a;font-size:22px;}
+    .sub,.toolbar,.scroll-hint,footer,.section-label .hint,.glegend,.group h3 .tag,.arrows{display:none!important;}
+    .section-label{color:#0b1f2a;padding:9px 0 0;border:none;}
+    .groups{grid-template-columns:repeat(6,1fr);gap:5px;padding:5px 0;}
+    .group{background:#fff;border:1px solid #ccc;break-inside:avoid;padding:5px;}
+    .group h3{color:#0b1f2a;font-size:11px;margin-bottom:4px;}
+    .row{background:#fff;border:1px solid #eee;border-left:3px solid #bbb;padding:2px 4px;margin:2px 0;}
+    .row.q{border-left-color:#1f9d6b;}
+    .row.third{border-left-color:#c9821f;}
+    .row.out{opacity:.6;}
+    .pos{color:#555;}
+    .row input.team{color:#0b1f2a;font-size:11px;padding:2px 0;}
+    .flag{font-size:13px;width:20px;}
+    .board-wrap{overflow:visible;padding:5px 0;}
+    .board{gap:7px;min-width:0;width:100%;font-size:10.5px;}
+    .col{min-width:0;width:auto;flex:1;}
+    .col.final-col{min-width:0;width:auto;}
+    .col-head{color:#333;border-color:#ccc;font-size:10px;margin-bottom:6px;}
+    .col-head .n{color:#9a7a1e;}
+    .match{background:#fff;border:1px solid #ccc;break-inside:avoid;margin:3px 0;padding:3px;}
+    .match .code{color:#888;font-size:7.5px;margin-bottom:3px;}
+    .slot{background:#fff;border:1px solid #e6e6e6;padding:1px 5px;margin:2px 0;}
+    .slot select,.slot input,.seed-team{color:#0b1f2a!important;-webkit-appearance:none;appearance:none;font-size:10.5px;padding:3px 0;}
+    .slot select{background:transparent;}
+    .seed-team.empty,.slot select.placeholder{color:#9a9a9a!important;}
+    .slot.won{background:#eafaf3!important;border-color:#1f9d6b;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    .slot.won select,.slot.won .seed-team{color:#0b6b46!important;font-weight:700;}
+    .slot.lost{opacity:.5;}
+    .match.final{background:#fff;border:1.5px solid #c9821f;box-shadow:none;}
+    .match.final .code{color:#9a7a1e;}
+    .champion{background:#fff;border:1px solid #c9821f;padding:8px;}
+    .champion .trophy{font-size:20px;filter:none;}
+    .champion .lbl{color:#9a7a1e;}
+    .champ-select{background:#fff;color:#9a7a1e!important;border:1px solid #c9821f;-webkit-appearance:none;appearance:none;font-size:13px;}
+    .third-pp{background:#fff;border:1px dashed #bbb;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <p class="eyebrow">FIFA World Cup 26 · Canada · Mexico · USA</p>
+  <h1>Group <span class="thin">→</span> Final Predictor</h1>
+  <p class="sub">Rank each group with ▲▼, then tick the eight third-placed teams you expect to qualify — FIFA's Annex C table drops them into the correct Round-of-32 slots automatically. From there, every knockout slot is a dropdown of the two teams that reach it, up to the champion. Saves as you go.</p>
+  <div class="toolbar">
+    <span class="status" id="status"><span class="dot">●</span> Saved automatically</span>
+    <button class="btn" id="printBtn">Print / Save PDF</button>
+    <button class="btn" id="exportBtn">Save picks (file)</button>
+    <button class="btn ghost" id="importBtn">Load picks</button>
+    <input type="file" id="importFile" accept="application/json,.json" style="display:none">
+    <button class="btn ghost" id="clearKO">Clear knockouts</button>
+    <button class="btn ghost" id="resetAll">Reset all</button>
+  </div>
+</header>
+
+<div class="section-label">Group Stage <span class="hint">rank with ▲▼ · tick 8 best thirds</span></div>
+<p class="glegend"><b>1st–2nd qualify</b> &nbsp;·&nbsp; <i>tap “+ 3rd” on eight third-placed teams</i> &nbsp;·&nbsp; 4th out</p>
+<p class="counter" id="thirdCount">0 / 8 third-place qualifiers selected</p>
+<div class="groups" id="groups"></div>
+
+<div class="section-label">Knockout Bracket <span class="hint">thirds auto-placed by Annex C · winners via dropdown</span></div>
+<p class="scroll-hint">↔ Scroll sideways to move through the rounds</p>
+<div class="board-wrap"><div class="board" id="board"></div></div>
+
+<footer>
+  Seeds feed from your group ranking; the eight 3rd-place dropdowns are filtered to FIFA's eligible groups. Each later round lists only the winners you advanced. Knockout tree per official codes M73–M104.
+</footer>
+
+<script>
+/* ---------------- DATA ---------------- */
+const GROUPS_INIT={
+  A:['Mexico','South Korea','Czechia','South Africa'],
+  B:['Switzerland','Canada','Qatar','Bosnia & Herzegovina'],
+  C:['Brazil','Scotland','Morocco','Haiti'],
+  D:['USA','Australia','Türkiye','Paraguay'],
+  E:['Germany','Ivory Coast','Ecuador','Curaçao'],
+  F:['Sweden','Japan','Netherlands','Tunisia'],
+  G:['Belgium','Egypt','Iran','New Zealand'],
+  H:['Spain','Uruguay','Saudi Arabia','Cape Verde'],
+  I:['France','Senegal','Norway','Iraq'],
+  J:['Argentina','Austria','Algeria','Jordan'],
+  K:['Portugal','Colombia','Uzbekistan','DR Congo'],
+  L:['England','Croatia','Ghana','Panama']
+};
+const GROUP_LETTERS=['A','B','C','D','E','F','G','H','I','J','K','L'];
+
+const FLAGS={
+  'Mexico':'🇲🇽','South Korea':'🇰🇷','Czechia':'🇨🇿','South Africa':'🇿🇦',
+  'Switzerland':'🇨🇭','Canada':'🇨🇦','Qatar':'🇶🇦','Bosnia & Herzegovina':'🇧🇦',
+  'Brazil':'🇧🇷','Scotland':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','Morocco':'🇲🇦','Haiti':'🇭🇹',
+  'USA':'🇺🇸','Australia':'🇦🇺','Türkiye':'🇹🇷','Paraguay':'🇵🇾',
+  'Germany':'🇩🇪','Ivory Coast':'🇨🇮','Ecuador':'🇪🇨','Curaçao':'🇨🇼',
+  'Sweden':'🇸🇪','Japan':'🇯🇵','Netherlands':'🇳🇱','Tunisia':'🇹🇳',
+  'Belgium':'🇧🇪','Egypt':'🇪🇬','Iran':'🇮🇷','New Zealand':'🇳🇿',
+  'Spain':'🇪🇸','Uruguay':'🇺🇾','Saudi Arabia':'🇸🇦','Cape Verde':'🇨🇻',
+  'France':'🇫🇷','Senegal':'🇸🇳','Norway':'🇳🇴','Iraq':'🇮🇶',
+  'Argentina':'🇦🇷','Austria':'🇦🇹','Algeria':'🇩🇿','Jordan':'🇯🇴',
+  'Portugal':'🇵🇹','Colombia':'🇨🇴','Uzbekistan':'🇺🇿','DR Congo':'🇨🇩',
+  'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Croatia':'🇭🇷','Ghana':'🇬🇭','Panama':'🇵🇦'
+};
+function flagFor(t){return t?(FLAGS[t.trim()]||''):'';}
+function withFlag(t){const f=flagFor(t);return f?f+' '+t:t;}
+
+const MATCHES={
+  M73:{code:'M73',a:'2A',b:'2B',dest:{m:'M90',s:'a'}},
+  M74:{code:'M74',a:'1E',b:'3ABCDF',dest:{m:'M89',s:'a'}},
+  M75:{code:'M75',a:'1F',b:'2C',dest:{m:'M90',s:'b'}},
+  M76:{code:'M76',a:'1C',b:'2F',dest:{m:'M91',s:'a'}},
+  M77:{code:'M77',a:'1I',b:'3CDFGH',dest:{m:'M89',s:'b'}},
+  M78:{code:'M78',a:'2E',b:'2I',dest:{m:'M91',s:'b'}},
+  M79:{code:'M79',a:'1A',b:'3CEFHI',dest:{m:'M92',s:'a'}},
+  M80:{code:'M80',a:'1L',b:'3EHIJK',dest:{m:'M92',s:'b'}},
+  M81:{code:'M81',a:'1D',b:'3BEFIJ',dest:{m:'M94',s:'a'}},
+  M82:{code:'M82',a:'1G',b:'3AEHIJ',dest:{m:'M94',s:'b'}},
+  M83:{code:'M83',a:'2K',b:'2L',dest:{m:'M93',s:'a'}},
+  M84:{code:'M84',a:'1H',b:'2J',dest:{m:'M93',s:'b'}},
+  M85:{code:'M85',a:'1B',b:'3EFGIJ',dest:{m:'M96',s:'a'}},
+  M86:{code:'M86',a:'1J',b:'2H',dest:{m:'M95',s:'a'}},
+  M87:{code:'M87',a:'1K',b:'3DEIJL',dest:{m:'M96',s:'b'}},
+  M88:{code:'M88',a:'2D',b:'2G',dest:{m:'M95',s:'b'}},
+  M89:{code:'M89',a:'Winner M74',b:'Winner M77',dest:{m:'M97',s:'a'}},
+  M90:{code:'M90',a:'Winner M73',b:'Winner M75',dest:{m:'M97',s:'b'}},
+  M91:{code:'M91',a:'Winner M76',b:'Winner M78',dest:{m:'M99',s:'a'}},
+  M92:{code:'M92',a:'Winner M79',b:'Winner M80',dest:{m:'M99',s:'b'}},
+  M93:{code:'M93',a:'Winner M83',b:'Winner M84',dest:{m:'M98',s:'a'}},
+  M94:{code:'M94',a:'Winner M81',b:'Winner M82',dest:{m:'M98',s:'b'}},
+  M95:{code:'M95',a:'Winner M86',b:'Winner M88',dest:{m:'M100',s:'a'}},
+  M96:{code:'M96',a:'Winner M85',b:'Winner M87',dest:{m:'M100',s:'b'}},
+  M97:{code:'M97',a:'Winner M89',b:'Winner M90',dest:{m:'M101',s:'a'}},
+  M98:{code:'M98',a:'Winner M93',b:'Winner M94',dest:{m:'M101',s:'b'}},
+  M99:{code:'M99',a:'Winner M91',b:'Winner M92',dest:{m:'M102',s:'a'}},
+  M100:{code:'M100',a:'Winner M95',b:'Winner M96',dest:{m:'M102',s:'b'}},
+  M101:{code:'M101',a:'Winner M97',b:'Winner M98',dest:{m:'M104',s:'a'},loserDest:{m:'M103',s:'a'}},
+  M102:{code:'M102',a:'Winner M99',b:'Winner M100',dest:{m:'M104',s:'b'},loserDest:{m:'M103',s:'b'}},
+  M104:{code:'Final · 19 Jul · New York/New Jersey',a:'Winner M101',b:'Winner M102',dest:{m:'CHAMP',s:'x'}},
+  M103:{code:'3rd Place · 18 Jul · Miami',a:'Loser M101',b:'Loser M102'}
+};
+const R32_ORDER=['M74','M77','M73','M75','M83','M84','M81','M82','M76','M78','M79','M80','M86','M88','M85','M87'];
+const COLUMNS=[
+  {head:'Round of 16',n:'M89–96',ids:['M89','M90','M93','M94','M91','M92','M95','M96']},
+  {head:'Quarter-finals',n:'M97–100',ids:['M97','M98','M99','M100']},
+  {head:'Semi-finals',n:'M101–102',ids:['M101','M102']}
+];
+/* dependency order for refreshing winner dropdowns (upstream first) */
+const WINNER_ORDER=['M89','M90','M91','M92','M93','M94','M95','M96','M97','M98','M99','M100','M101','M102','M104'];
+const ANNEXC={"EFGHIJKL":"EJIFHGLK","DFGHIJKL":"HGIDJFLK","DEGHIJKL":"EJIDHGLK","DEFHIJKL":"EJIDHFLK","DEFGIJKL":"EGIDJFLK","DEFGHJKL":"EGJDHFLK","DEFGHIKL":"EGIDHFLK","DEFGHIJL":"EGJDHFLI","DEFGHIJK":"EGJDHFIK","CFGHIJKL":"HGICJFLK","CEGHIJKL":"EJICHGLK","CEFHIJKL":"EJICHFLK","CEFGIJKL":"EGICJFLK","CEFGHJKL":"EGJCHFLK","CEFGHIKL":"EGICHFLK","CEFGHIJL":"EGJCHFLI","CEFGHIJK":"EGJCHFIK","CDGHIJKL":"HGICJDLK","CDFHIJKL":"CJIDHFLK","CDFGIJKL":"CGIDJFLK","CDFGHJKL":"CGJDHFLK","CDFGHIKL":"CGIDHFLK","CDFGHIJL":"CGJDHFLI","CDFGHIJK":"CGJDHFIK","CDEHIJKL":"EJICHDLK","CDEGIJKL":"EGICJDLK","CDEGHJKL":"EGJCHDLK","CDEGHIKL":"EGICHDLK","CDEGHIJL":"EGJCHDLI","CDEGHIJK":"EGJCHDIK","CDEFIJKL":"CJEDIFLK","CDEFHJKL":"CJEDHFLK","CDEFHIKL":"CEIDHFLK","CDEFHIJL":"CJEDHFLI","CDEFHIJK":"CJEDHFIK","CDEFGJKL":"CGEDJFLK","CDEFGIKL":"CGEDIFLK","CDEFGIJL":"CGEDJFLI","CDEFGIJK":"CGEDJFIK","CDEFGHKL":"CGEDHFLK","CDEFGHJL":"CGJDHFLE","CDEFGHJK":"CGJDHFEK","CDEFGHIL":"CGEDHFLI","CDEFGHIK":"CGEDHFIK","CDEFGHIJ":"CGJDHFEI","BFGHIJKL":"HJBFIGLK","BEGHIJKL":"EJIBHGLK","BEFHIJKL":"EJBFIHLK","BEFGIJKL":"EJBFIGLK","BEFGHJKL":"EJBFHGLK","BEFGHIKL":"EGBFIHLK","BEFGHIJL":"EJBFHGLI","BEFGHIJK":"EJBFHGIK","BDGHIJKL":"HJBDIGLK","BDFHIJKL":"HJBDIFLK","BDFGIJKL":"IGBDJFLK","BDFGHJKL":"HGBDJFLK","BDFGHIKL":"HGBDIFLK","BDFGHIJL":"HGBDJFLI","BDFGHIJK":"HGBDJFIK","BDEHIJKL":"EJBDIHLK","BDEGIJKL":"EJBDIGLK","BDEGHJKL":"EJBDHGLK","BDEGHIKL":"EGBDIHLK","BDEGHIJL":"EJBDHGLI","BDEGHIJK":"EJBDHGIK","BDEFIJKL":"EJBDIFLK","BDEFHJKL":"EJBDHFLK","BDEFHIKL":"EIBDHFLK","BDEFHIJL":"EJBDHFLI","BDEFHIJK":"EJBDHFIK","BDEFGJKL":"EGBDJFLK","BDEFGIKL":"EGBDIFLK","BDEFGIJL":"EGBDJFLI","BDEFGIJK":"EGBDJFIK","BDEFGHKL":"EGBDHFLK","BDEFGHJL":"HGBDJFLE","BDEFGHJK":"HGBDJFEK","BDEFGHIL":"EGBDHFLI","BDEFGHIK":"EGBDHFIK","BDEFGHIJ":"HGBDJFEI","BCGHIJKL":"HJBCIGLK","BCFHIJKL":"HJBCIFLK","BCFGIJKL":"IGBCJFLK","BCFGHJKL":"HGBCJFLK","BCFGHIKL":"HGBCIFLK","BCFGHIJL":"HGBCJFLI","BCFGHIJK":"HGBCJFIK","BCEHIJKL":"EJBCIHLK","BCEGIJKL":"EJBCIGLK","BCEGHJKL":"EJBCHGLK","BCEGHIKL":"EGBCIHLK","BCEGHIJL":"EJBCHGLI","BCEGHIJK":"EJBCHGIK","BCEFIJKL":"EJBCIFLK","BCEFHJKL":"EJBCHFLK","BCEFHIKL":"EIBCHFLK","BCEFHIJL":"EJBCHFLI","BCEFHIJK":"EJBCHFIK","BCEFGJKL":"EGBCJFLK","BCEFGIKL":"EGBCIFLK","BCEFGIJL":"EGBCJFLI","BCEFGIJK":"EGBCJFIK","BCEFGHKL":"EGBCHFLK","BCEFGHJL":"HGBCJFLE","BCEFGHJK":"HGBCJFEK","BCEFGHIL":"EGBCHFLI","BCEFGHIK":"EGBCHFIK","BCEFGHIJ":"HGBCJFEI","BCDHIJKL":"HJBCIDLK","BCDGIJKL":"IGBCJDLK","BCDGHJKL":"HGBCJDLK","BCDGHIKL":"HGBCIDLK","BCDGHIJL":"HGBCJDLI","BCDGHIJK":"HGBCJDIK","BCDFIJKL":"CJBDIFLK","BCDFHJKL":"CJBDHFLK","BCDFHIKL":"CIBDHFLK","BCDFHIJL":"CJBDHFLI","BCDFHIJK":"CJBDHFIK","BCDFGJKL":"CGBDJFLK","BCDFGIKL":"CGBDIFLK","BCDFGIJL":"CGBDJFLI","BCDFGIJK":"CGBDJFIK","BCDFGHKL":"CGBDHFLK","BCDFGHJL":"CGBDHFLJ","BCDFGHJK":"HGBCJFDK","BCDFGHIL":"CGBDHFLI","BCDFGHIK":"CGBDHFIK","BCDFGHIJ":"HGBCJFDI","BCDEIJKL":"EJBCIDLK","BCDEHJKL":"EJBCHDLK","BCDEHIKL":"EIBCHDLK","BCDEHIJL":"EJBCHDLI","BCDEHIJK":"EJBCHDIK","BCDEGJKL":"EGBCJDLK","BCDEGIKL":"EGBCIDLK","BCDEGIJL":"EGBCJDLI","BCDEGIJK":"EGBCJDIK","BCDEGHKL":"EGBCHDLK","BCDEGHJL":"HGBCJDLE","BCDEGHJK":"HGBCJDEK","BCDEGHIL":"EGBCHDLI","BCDEGHIK":"EGBCHDIK","BCDEGHIJ":"HGBCJDEI","BCDEFJKL":"CJBDEFLK","BCDEFIKL":"CEBDIFLK","BCDEFIJL":"CJBDEFLI","BCDEFIJK":"CJBDEFIK","BCDEFHKL":"CEBDHFLK","BCDEFHJL":"CJBDHFLE","BCDEFHJK":"CJBDHFEK","BCDEFHIL":"CEBDHFLI","BCDEFHIK":"CEBDHFIK","BCDEFHIJ":"CJBDHFEI","BCDEFGKL":"CGBDEFLK","BCDEFGJL":"CGBDJFLE","BCDEFGJK":"CGBDJFEK","BCDEFGIL":"CGBDEFLI","BCDEFGIK":"CGBDEFIK","BCDEFGIJ":"CGBDJFEI","BCDEFGHL":"CGBDHFLE","BCDEFGHK":"CGBDHFEK","BCDEFGHJ":"HGBCJFDE","BCDEFGHI":"CGBDHFEI","AFGHIJKL":"HJIFAGLK","AEGHIJKL":"EJIAHGLK","AEFHIJKL":"EJIFAHLK","AEFGIJKL":"EJIFAGLK","AEFGHJKL":"EGJFAHLK","AEFGHIKL":"EGIFAHLK","AEFGHIJL":"EGJFAHLI","AEFGHIJK":"EGJFAHIK","ADGHIJKL":"HJIDAGLK","ADFHIJKL":"HJIDAFLK","ADFGIJKL":"IGJDAFLK","ADFGHJKL":"HGJDAFLK","ADFGHIKL":"HGIDAFLK","ADFGHIJL":"HGJDAFLI","ADFGHIJK":"HGJDAFIK","ADEHIJKL":"EJIDAHLK","ADEGIJKL":"EJIDAGLK","ADEGHJKL":"EGJDAHLK","ADEGHIKL":"EGIDAHLK","ADEGHIJL":"EGJDAHLI","ADEGHIJK":"EGJDAHIK","ADEFIJKL":"EJIDAFLK","ADEFHJKL":"HJEDAFLK","ADEFHIKL":"HEIDAFLK","ADEFHIJL":"HJEDAFLI","ADEFHIJK":"HJEDAFIK","ADEFGJKL":"EGJDAFLK","ADEFGIKL":"EGIDAFLK","ADEFGIJL":"EGJDAFLI","ADEFGIJK":"EGJDAFIK","ADEFGHKL":"HGEDAFLK","ADEFGHJL":"HGJDAFLE","ADEFGHJK":"HGJDAFEK","ADEFGHIL":"HGEDAFLI","ADEFGHIK":"HGEDAFIK","ADEFGHIJ":"HGJDAFEI","ACGHIJKL":"HJICAGLK","ACFHIJKL":"HJICAFLK","ACFGIJKL":"IGJCAFLK","ACFGHJKL":"HGJCAFLK","ACFGHIKL":"HGICAFLK","ACFGHIJL":"HGJCAFLI","ACFGHIJK":"HGJCAFIK","ACEHIJKL":"EJICAHLK","ACEGIJKL":"EJICAGLK","ACEGHJKL":"EGJCAHLK","ACEGHIKL":"EGICAHLK","ACEGHIJL":"EGJCAHLI","ACEGHIJK":"EGJCAHIK","ACEFIJKL":"EJICAFLK","ACEFHJKL":"HJECAFLK","ACEFHIKL":"HEICAFLK","ACEFHIJL":"HJECAFLI","ACEFHIJK":"HJECAFIK","ACEFGJKL":"EGJCAFLK","ACEFGIKL":"EGICAFLK","ACEFGIJL":"EGJCAFLI","ACEFGIJK":"EGJCAFIK","ACEFGHKL":"HGECAFLK","ACEFGHJL":"HGJCAFLE","ACEFGHJK":"HGJCAFEK","ACEFGHIL":"HGECAFLI","ACEFGHIK":"HGECAFIK","ACEFGHIJ":"HGJCAFEI","ACDHIJKL":"HJICADLK","ACDGIJKL":"IGJCADLK","ACDGHJKL":"HGJCADLK","ACDGHIKL":"HGICADLK","ACDGHIJL":"HGJCADLI","ACDGHIJK":"HGJCADIK","ACDFIJKL":"CJIDAFLK","ACDFHJKL":"HJFCADLK","ACDFHIKL":"HFICADLK","ACDFHIJL":"HJFCADLI","ACDFHIJK":"HJFCADIK","ACDFGJKL":"CGJDAFLK","ACDFGIKL":"CGIDAFLK","ACDFGIJL":"CGJDAFLI","ACDFGIJK":"CGJDAFIK","ACDFGHKL":"HGFCADLK","ACDFGHJL":"CGJDAFLH","ACDFGHJK":"HGJCAFDK","ACDFGHIL":"HGFCADLI","ACDFGHIK":"HGFCADIK","ACDFGHIJ":"HGJCAFDI","ACDEIJKL":"EJICADLK","ACDEHJKL":"HJECADLK","ACDEHIKL":"HEICADLK","ACDEHIJL":"HJECADLI","ACDEHIJK":"HJECADIK","ACDEGJKL":"EGJCADLK","ACDEGIKL":"EGICADLK","ACDEGIJL":"EGJCADLI","ACDEGIJK":"EGJCADIK","ACDEGHKL":"HGECADLK","ACDEGHJL":"HGJCADLE","ACDEGHJK":"HGJCADEK","ACDEGHIL":"HGECADLI","ACDEGHIK":"HGECADIK","ACDEGHIJ":"HGJCADEI","ACDEFJKL":"CJEDAFLK","ACDEFIKL":"CEIDAFLK","ACDEFIJL":"CJEDAFLI","ACDEFIJK":"CJEDAFIK","ACDEFHKL":"HEFCADLK","ACDEFHJL":"HJFCADLE","ACDEFHJK":"HJECAFDK","ACDEFHIL":"HEFCADLI","ACDEFHIK":"HEFCADIK","ACDEFHIJ":"HJECAFDI","ACDEFGKL":"CGEDAFLK","ACDEFGJL":"CGJDAFLE","ACDEFGJK":"CGJDAFEK","ACDEFGIL":"CGEDAFLI","ACDEFGIK":"CGEDAFIK","ACDEFGIJ":"CGJDAFEI","ACDEFGHL":"HGFCADLE","ACDEFGHK":"HGECAFDK","ACDEFGHJ":"HGJCAFDE","ACDEFGHI":"HGECAFDI","ABGHIJKL":"HJBAIGLK","ABFHIJKL":"HJBAIFLK","ABFGIJKL":"IJBFAGLK","ABFGHJKL":"HJBFAGLK","ABFGHIKL":"HGBAIFLK","ABFGHIJL":"HJBFAGLI","ABFGHIJK":"HJBFAGIK","ABEHIJKL":"EJBAIHLK","ABEGIJKL":"EJBAIGLK","ABEGHJKL":"EJBAHGLK","ABEGHIKL":"EGBAIHLK","ABEGHIJL":"EJBAHGLI","ABEGHIJK":"EJBAHGIK","ABEFIJKL":"EJBAIFLK","ABEFHJKL":"EJBFAHLK","ABEFHIKL":"EIBFAHLK","ABEFHIJL":"EJBFAHLI","ABEFHIJK":"EJBFAHIK","ABEFGJKL":"EJBFAGLK","ABEFGIKL":"EGBAIFLK","ABEFGIJL":"EJBFAGLI","ABEFGIJK":"EJBFAGIK","ABEFGHKL":"EGBFAHLK","ABEFGHJL":"HJBFAGLE","ABEFGHJK":"HJBFAGEK","ABEFGHIL":"EGBFAHLI","ABEFGHIK":"EGBFAHIK","ABEFGHIJ":"HJBFAGEI","ABDHIJKL":"IJBDAHLK","ABDGIJKL":"IJBDAGLK","ABDGHJKL":"HJBDAGLK","ABDGHIKL":"IGBDAHLK","ABDGHIJL":"HJBDAGLI","ABDGHIJK":"HJBDAGIK","ABDFIJKL":"IJBDAFLK","ABDFHJKL":"HJBDAFLK","ABDFHIKL":"HIBDAFLK","ABDFHIJL":"HJBDAFLI","ABDFHIJK":"HJBDAFIK","ABDFGJKL":"FJBDAGLK","ABDFGIKL":"IGBDAFLK","ABDFGIJL":"FJBDAGLI","ABDFGIJK":"FJBDAGIK","ABDFGHKL":"HGBDAFLK","ABDFGHJL":"HGBDAFLJ","ABDFGHJK":"HGBDAFJK","ABDFGHIL":"HGBDAFLI","ABDFGHIK":"HGBDAFIK","ABDFGHIJ":"HGBDAFIJ","ABDEIJKL":"EJBAIDLK","ABDEHJKL":"EJBDAHLK","ABDEHIKL":"EIBDAHLK","ABDEHIJL":"EJBDAHLI","ABDEHIJK":"EJBDAHIK","ABDEGJKL":"EJBDAGLK","ABDEGIKL":"EGBAIDLK","ABDEGIJL":"EJBDAGLI","ABDEGIJK":"EJBDAGIK","ABDEGHKL":"EGBDAHLK","ABDEGHJL":"HJBDAGLE","ABDEGHJK":"HJBDAGEK","ABDEGHIL":"EGBDAHLI","ABDEGHIK":"EGBDAHIK","ABDEGHIJ":"HJBDAGEI","ABDEFJKL":"EJBDAFLK","ABDEFIKL":"EIBDAFLK","ABDEFIJL":"EJBDAFLI","ABDEFIJK":"EJBDAFIK","ABDEFHKL":"HEBDAFLK","ABDEFHJL":"HJBDAFLE","ABDEFHJK":"HJBDAFEK","ABDEFHIL":"HEBDAFLI","ABDEFHIK":"HEBDAFIK","ABDEFHIJ":"HJBDAFEI","ABDEFGKL":"EGBDAFLK","ABDEFGJL":"EGBDAFLJ","ABDEFGJK":"EGBDAFJK","ABDEFGIL":"EGBDAFLI","ABDEFGIK":"EGBDAFIK","ABDEFGIJ":"EGBDAFIJ","ABDEFGHL":"HGBDAFLE","ABDEFGHK":"HGBDAFEK","ABDEFGHJ":"HGBDAFEJ","ABDEFGHI":"HGBDAFEI","ABCHIJKL":"IJBCAHLK","ABCGIJKL":"IJBCAGLK","ABCGHJKL":"HJBCAGLK","ABCGHIKL":"IGBCAHLK","ABCGHIJL":"HJBCAGLI","ABCGHIJK":"HJBCAGIK","ABCFIJKL":"IJBCAFLK","ABCFHJKL":"HJBCAFLK","ABCFHIKL":"HIBCAFLK","ABCFHIJL":"HJBCAFLI","ABCFHIJK":"HJBCAFIK","ABCFGJKL":"CJBFAGLK","ABCFGIKL":"IGBCAFLK","ABCFGIJL":"CJBFAGLI","ABCFGIJK":"CJBFAGIK","ABCFGHKL":"HGBCAFLK","ABCFGHJL":"HGBCAFLJ","ABCFGHJK":"HGBCAFJK","ABCFGHIL":"HGBCAFLI","ABCFGHIK":"HGBCAFIK","ABCFGHIJ":"HGBCAFIJ","ABCEIJKL":"EJBAICLK","ABCEHJKL":"EJBCAHLK","ABCEHIKL":"EIBCAHLK","ABCEHIJL":"EJBCAHLI","ABCEHIJK":"EJBCAHIK","ABCEGJKL":"EJBCAGLK","ABCEGIKL":"EGBAICLK","ABCEGIJL":"EJBCAGLI","ABCEGIJK":"EJBCAGIK","ABCEGHKL":"EGBCAHLK","ABCEGHJL":"HJBCAGLE","ABCEGHJK":"HJBCAGEK","ABCEGHIL":"EGBCAHLI","ABCEGHIK":"EGBCAHIK","ABCEGHIJ":"HJBCAGEI","ABCEFJKL":"EJBCAFLK","ABCEFIKL":"EIBCAFLK","ABCEFIJL":"EJBCAFLI","ABCEFIJK":"EJBCAFIK","ABCEFHKL":"HEBCAFLK","ABCEFHJL":"HJBCAFLE","ABCEFHJK":"HJBCAFEK","ABCEFHIL":"HEBCAFLI","ABCEFHIK":"HEBCAFIK","ABCEFHIJ":"HJBCAFEI","ABCEFGKL":"EGBCAFLK","ABCEFGJL":"EGBCAFLJ","ABCEFGJK":"EGBCAFJK","ABCEFGIL":"EGBCAFLI","ABCEFGIK":"EGBCAFIK","ABCEFGIJ":"EGBCAFIJ","ABCEFGHL":"HGBCAFLE","ABCEFGHK":"HGBCAFEK","ABCEFGHJ":"HGBCAFEJ","ABCEFGHI":"HGBCAFEI","ABCDIJKL":"IJBCADLK","ABCDHJKL":"HJBCADLK","ABCDHIKL":"HIBCADLK","ABCDHIJL":"HJBCADLI","ABCDHIJK":"HJBCADIK","ABCDGJKL":"CJBDAGLK","ABCDGIKL":"IGBCADLK","ABCDGIJL":"CJBDAGLI","ABCDGIJK":"CJBDAGIK","ABCDGHKL":"HGBCADLK","ABCDGHJL":"HGBCADLJ","ABCDGHJK":"HGBCADJK","ABCDGHIL":"HGBCADLI","ABCDGHIK":"HGBCADIK","ABCDGHIJ":"HGBCADIJ","ABCDFJKL":"CJBDAFLK","ABCDFIKL":"CIBDAFLK","ABCDFIJL":"CJBDAFLI","ABCDFIJK":"CJBDAFIK","ABCDFHKL":"HFBCADLK","ABCDFHJL":"CJBDAFLH","ABCDFHJK":"HJBCAFDK","ABCDFHIL":"HFBCADLI","ABCDFHIK":"HFBCADIK","ABCDFHIJ":"HJBCAFDI","ABCDFGKL":"CGBDAFLK","ABCDFGJL":"CGBDAFLJ","ABCDFGJK":"CGBDAFJK","ABCDFGIL":"CGBDAFLI","ABCDFGIK":"CGBDAFIK","ABCDFGIJ":"CGBDAFIJ","ABCDFGHL":"CGBDAFLH","ABCDFGHK":"HGBCAFDK","ABCDFGHJ":"HGBCAFDJ","ABCDFGHI":"HGBCAFDI","ABCDEJKL":"EJBCADLK","ABCDEIKL":"EIBCADLK","ABCDEIJL":"EJBCADLI","ABCDEIJK":"EJBCADIK","ABCDEHKL":"HEBCADLK","ABCDEHJL":"HJBCADLE","ABCDEHJK":"HJBCADEK","ABCDEHIL":"HEBCADLI","ABCDEHIK":"HEBCADIK","ABCDEHIJ":"HJBCADEI","ABCDEGKL":"EGBCADLK","ABCDEGJL":"EGBCADLJ","ABCDEGJK":"EGBCADJK","ABCDEGIL":"EGBCADLI","ABCDEGIK":"EGBCADIK","ABCDEGIJ":"EGBCADIJ","ABCDEGHL":"HGBCADLE","ABCDEGHK":"HGBCADEK","ABCDEGHJ":"HGBCADEJ","ABCDEGHI":"HGBCADEI","ABCDEFKL":"CEBDAFLK","ABCDEFJL":"CJBDAFLE","ABCDEFJK":"CJBDAFEK","ABCDEFIL":"CEBDAFLI","ABCDEFIK":"CEBDAFIK","ABCDEFIJ":"CJBDAFEI","ABCDEFHL":"HFBCADLE","ABCDEFHK":"HEBCAFDK","ABCDEFHJ":"HJBCAFDE","ABCDEFHI":"HEBCAFDI","ABCDEFGL":"CGBDAFLE","ABCDEFGK":"CGBDAFEK","ABCDEFGJ":"CGBDAFEJ","ABCDEFGI":"CGBDAFEI","ABCDEFGH":"HGBCAFDE"};
+const THIRD_SLOT_ORDER=['M79.b','M85.b','M81.b','M74.b','M82.b','M77.b','M87.b','M80.b'];
+let THIRD_MAP={};
+function selectedThirds(){return Object.keys(state.thirdQual).filter(g=>state.thirdQual[g]).sort();}
+function computeThirdMap(){THIRD_MAP={};const sel=selectedThirds();if(sel.length!==8)return;const v=ANNEXC[sel.join('')];if(!v)return;for(let i=0;i<8;i++){THIRD_MAP[THIRD_SLOT_ORDER[i]]=v[i];}}
+
+/* ---------------- STATE ---------------- */
+const STORE_KEY='wc26-predictor-v3';
+let state={groups:clone(GROUPS_INIT),thirdQual:{},picks:{}};
+function clone(o){return JSON.parse(JSON.stringify(o));}
+
+function parseSlot(ph){
+  if(/^[12][A-L]$/.test(ph))return{type:'seed',rank:+ph[0],group:ph[1]};
+  if(/^3[A-L]+$/.test(ph))return{type:'third',groups:ph.slice(1).split('')};
+  let m=ph.match(/^Winner (M\d+)$/);if(m)return{type:'winner',feeder:m[1]};
+  m=ph.match(/^Loser (M\d+)$/);if(m)return{type:'loser',feeder:m[1]};
+  return{type:'plain'};
+}
+function slotPH(mid,s){return s==='a'?MATCHES[mid].a:MATCHES[mid].b;}
+
+/* team currently in a slot, computed from groups + thirds + picks */
+function valueOf(mid,s){
+  const key=mid+'.'+s,p=parseSlot(slotPH(mid,s));
+  if(p.type==='seed'){const a=state.groups[p.group];return a&&a[p.rank-1]?a[p.rank-1].trim():'';}
+  if(p.type==='third'){const g=THIRD_MAP[key];if(!g)return'';const a=state.groups[g];return a&&a[2]?a[2].trim():'';}
+  if(p.type==='winner'){const c=[valueOf(p.feeder,'a'),valueOf(p.feeder,'b')];const pk=state.picks[key]||'';return c.includes(pk)?pk:'';}
+  if(p.type==='loser'){const c=[valueOf(p.feeder,'a'),valueOf(p.feeder,'b')];if(!c[0]||!c[1])return'';const w=advancing(p.feeder);if(!w||!c.includes(w))return'';return c[0]===w?c[1]:c[0];}
+  return'';
+}
+/* team that advanced OUT of a match (the one selected in its destination) */
+function advancing(mid){
+  const m=MATCHES[mid];if(!m||!m.dest)return'';
+  if(m.dest.m==='CHAMP')return state.picks['CHAMP']||'';
+  return valueOf(m.dest.m,m.dest.s);
+}
+
+/* ---------------- PERSISTENCE ---------------- */
+let flashT;
+function flash(){const s=document.getElementById('status');s.innerHTML='<span class="dot">●</span> Saved';clearTimeout(flashT);flashT=setTimeout(()=>{s.innerHTML='<span class="dot">●</span> Saved automatically';},1200);}
+async function save(){try{if(window.storage)await window.storage.set(STORE_KEY,JSON.stringify(state),false);}catch(e){}flash();}
+async function load(){try{if(window.storage){const r=await window.storage.get(STORE_KEY,false);if(r&&r.value){const d=JSON.parse(r.value);state.groups=d.groups||clone(GROUPS_INIT);state.thirdQual=d.thirdQual||{};state.picks=d.picks||{};}}}catch(e){}}
+
+/* ---------------- GROUPS ---------------- */
+function renderGroups(){
+  const wrap=document.getElementById('groups');wrap.innerHTML='';
+  GROUP_LETTERS.forEach(g=>{
+    const card=document.createElement('div');card.className='group';
+    const h=document.createElement('h3');h.innerHTML='Group '+g+'<span class="tag">tap ▲▼ to rank</span>';card.appendChild(h);
+    state.groups[g].forEach((team,i)=>{
+      const row=document.createElement('div');row.className='row '+(i<2?'q':(i===2?'third':'out'));
+      const pos=document.createElement('span');pos.className='pos';pos.textContent=(i+1);row.appendChild(pos);
+      const flag=document.createElement('span');flag.className='flag';flag.textContent=flagFor(team);row.appendChild(flag);
+      const inp=document.createElement('input');inp.className='team';inp.type='text';inp.value=team;inp.spellcheck=false;inp.autocomplete='off';
+      inp.addEventListener('input',()=>{state.groups[g][i]=inp.value;flag.textContent=flagFor(inp.value);rebuild();save();});
+      row.appendChild(inp);
+      if(i===2){const q=document.createElement('button');q.type='button';q.className='qual'+(state.thirdQual[g]?' on':'');q.textContent=state.thirdQual[g]?'✓ 3rd':'+ 3rd';q.title='Mark as a best-third qualifier';
+        q.addEventListener('click',()=>{if(state.thirdQual[g]){delete state.thirdQual[g];}else{if(selectedThirds().length>=8){pulseCounter();return;}state.thirdQual[g]=true;}renderGroups();rebuild();save();});
+        row.appendChild(q);}
+      const arrows=document.createElement('div');arrows.className='arrows';
+      const up=document.createElement('button');up.textContent='▲';up.disabled=(i===0);up.addEventListener('click',()=>move(g,i,-1));
+      const dn=document.createElement('button');dn.textContent='▼';dn.disabled=(i===3);dn.addEventListener('click',()=>move(g,i,1));
+      arrows.appendChild(up);arrows.appendChild(dn);row.appendChild(arrows);card.appendChild(row);
+    });
+    wrap.appendChild(card);
+  });
+}
+function move(g,i,dir){const j=i+dir,a=state.groups[g];if(j<0||j>3)return;[a[i],a[j]]=[a[j],a[i]];renderGroups();rebuild();save();}
+
+/* ---------------- BRACKET ---------------- */
+function slotEl(mid,s){
+  const key=mid+'.'+s,p=parseSlot(slotPH(mid,s));
+  const wrap=document.createElement('label');wrap.className='slot';wrap.dataset.key=key;
+  if(p.type==='seed'||p.type==='loser'||p.type==='third'){
+    const span=document.createElement('span');span.className='seed-team';span.dataset.disp=key;wrap.appendChild(span);
+  }else{ // third or winner -> dropdown
+    const sel=document.createElement('select');sel.dataset.sel=key;
+    sel.addEventListener('change',()=>{
+      state.picks[key]=sel.value;
+      rebuild();save();
+    });
+    wrap.appendChild(sel);
+  }
+  return wrap;
+}
+function matchEl(mid){
+  const m=MATCHES[mid];const box=document.createElement('div');box.className='match'+(mid==='M104'?' final':'');box.id='match-'+mid;
+  const code=document.createElement('p');code.className='code';code.textContent=m.code;box.appendChild(code);
+  box.appendChild(slotEl(mid,'a'));box.appendChild(slotEl(mid,'b'));return box;
+}
+function renderBracket(){
+  const board=document.getElementById('board');board.innerHTML='';
+  const c32=document.createElement('div');c32.className='col';
+  const h32=document.createElement('div');h32.className='col-head';h32.innerHTML='Round of 32 <span class="n">M73–88</span>';c32.appendChild(h32);
+  R32_ORDER.forEach(id=>c32.appendChild(matchEl(id)));board.appendChild(c32);
+  COLUMNS.forEach(col=>{
+    const c=document.createElement('div');c.className='col';
+    const h=document.createElement('div');h.className='col-head';h.innerHTML=col.head+' <span class="n">'+col.n+'</span>';c.appendChild(h);
+    col.ids.forEach(id=>c.appendChild(matchEl(id)));board.appendChild(c);
+  });
+  const fc=document.createElement('div');fc.className='col final-col';
+  const fh=document.createElement('div');fh.className='col-head';fh.innerHTML='Final <span class="n">M104</span>';fc.appendChild(fh);
+  const block=document.createElement('div');block.className='final-block';
+  block.appendChild(matchEl('M104'));
+  const champ=document.createElement('div');champ.className='champion';
+  champ.innerHTML='<div class="trophy">🏆</div><div class="lbl">World Champion</div>';
+  const csel=document.createElement('select');csel.className='champ-select';csel.id='champSelect';
+  csel.addEventListener('change',()=>{state.picks['CHAMP']=csel.value;rebuild();save();});
+  champ.appendChild(csel);block.appendChild(champ);
+  const third=document.createElement('div');third.className='third-pp';
+  const tc=document.createElement('p');tc.className='code';tc.textContent='3rd Place Play-off';third.appendChild(tc);
+  third.appendChild(slotEl('M103','a'));third.appendChild(slotEl('M103','b'));block.appendChild(third);
+  fc.appendChild(block);board.appendChild(fc);
+}
+
+function updateCounter(){const el=document.getElementById('thirdCount');if(!el)return;const n=selectedThirds().length;el.textContent=n===8?'8 / 8 thirds selected — placed automatically by Annex C':n+' / 8 third-place qualifiers selected';el.classList.toggle('done',n===8);}
+function pulseCounter(){const el=document.getElementById('thirdCount');if(!el)return;el.classList.remove('pulse');void el.offsetWidth;el.classList.add('pulse');}
+/* fill a <select> with candidate teams, reconciling stored value */
+function fillSelect(sel,key,cands,placeholder,store){
+  const valid=cands.filter(Boolean);
+  let cur=store[key]||'';
+  if(cur&&!valid.includes(cur)){delete store[key];cur='';}
+  sel.innerHTML='';
+  const def=document.createElement('option');def.value='';def.textContent=placeholder;sel.appendChild(def);
+  valid.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=withFlag(t);sel.appendChild(o);});
+  sel.value=cur;sel.classList.toggle('placeholder',!cur);
+}
+
+function rebuild(){
+  computeThirdMap();updateCounter();
+  // R32 seeds (display) + auto third placements
+  R32_ORDER.forEach(mid=>['a','b'].forEach(s=>{
+    const key=mid+'.'+s,p=parseSlot(slotPH(mid,s));
+    if(p.type==='seed'||p.type==='third'){
+      const span=document.querySelector('[data-disp="'+key+'"]');if(!span)return;
+      const t=valueOf(mid,s);
+      if(t){span.textContent=withFlag(t);span.classList.remove('empty');}else{span.textContent=slotPH(mid,s);span.classList.add('empty');}
+    }
+  }));
+  // winner dropdowns, upstream first
+  WINNER_ORDER.forEach(mid=>['a','b'].forEach(s=>{
+    const key=mid+'.'+s,p=parseSlot(slotPH(mid,s));if(p.type!=='winner')return;
+    const sel=document.querySelector('[data-sel="'+key+'"]');if(!sel)return;
+    fillSelect(sel,key,[valueOf(p.feeder,'a'),valueOf(p.feeder,'b')],slotPH(mid,s),state.picks);
+  }));
+  // champion
+  const csel=document.getElementById('champSelect');
+  if(csel)fillSelect(csel,'CHAMP',[valueOf('M104','a'),valueOf('M104','b')],'Pick the winner',state.picks);
+  // 3rd place losers (display)
+  ['a','b'].forEach(s=>{const span=document.querySelector('[data-disp="M103.'+s+'"]');if(!span)return;const t=valueOf('M103',s);if(t){span.textContent=withFlag(t);span.classList.remove('empty');}else{span.textContent=slotPH('M103',s);span.classList.add('empty');}});
+  // highlight winners
+  Object.keys(MATCHES).forEach(mid=>{
+    const box=document.getElementById('match-'+mid);if(!box)return;
+    const adv=advancing(mid),ta=valueOf(mid,'a'),tb=valueOf(mid,'b');
+    box.querySelectorAll('.slot').forEach(sl=>{
+      const s=sl.dataset.key.split('.')[1];sl.classList.remove('won','lost');
+      if(adv&&(ta||tb)){const t=s==='a'?ta:tb;if(t)sl.classList.add(t===adv?'won':'lost');}
+    });
+  });
+}
+
+/* ---------------- BUTTONS ---------------- */
+document.getElementById('printBtn').addEventListener('click',()=>window.print());
+document.getElementById('exportBtn').addEventListener('click',()=>{
+  const data={app:'wc26-predictor',version:3,exported:new Date().toISOString(),groups:state.groups,thirdQual:state.thirdQual,picks:state.picks};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const champ=state.picks['CHAMP']?('-'+state.picks['CHAMP'].replace(/[^A-Za-z]/g,'')):'';
+  const a=document.createElement('a');a.href=url;a.download='wc2026-bracket'+champ+'.json';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+});
+document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change',e=>{
+  const f=e.target.files&&e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!d||!d.groups)throw 0;
+      state.groups=d.groups;state.thirdQual=d.thirdQual||{};state.picks=d.picks||{};
+      renderGroups();renderBracket();rebuild();save();
+      const s=document.getElementById('status');s.innerHTML='<span class="dot">●</span> Picks loaded';
+      setTimeout(()=>{s.innerHTML='<span class="dot">●</span> Saved automatically';},1800);
+    }catch(err){
+      const s=document.getElementById('status');s.innerHTML='<span class="dot" style="color:#E0913C">●</span> Couldn\u2019t read that file';
+      setTimeout(()=>{s.innerHTML='<span class="dot">●</span> Saved automatically';},2200);
+    }
+    e.target.value='';
+  };
+  r.readAsText(f);
+});
+document.getElementById('clearKO').addEventListener('click',()=>{state.thirdQual={};state.picks={};rebuild();save();});
+document.getElementById('resetAll').addEventListener('click',async()=>{state={groups:clone(GROUPS_INIT),thirdQual:{},picks:{}};try{if(window.storage)await window.storage.delete(STORE_KEY,false);}catch(e){}renderGroups();renderBracket();rebuild();flash();});
+
+/* ---------------- INIT ---------------- */
+(async function(){await load();renderGroups();renderBracket();rebuild();})();
+</script>
+</body>
+</html>

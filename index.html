@@ -308,14 +308,14 @@ let TEAMSTATS={
  'Spain':{p:2,pts:4,gd:4,gf:4},'Uruguay':{p:2,pts:2,gd:0,gf:3},'Cape Verde':{p:2,pts:2,gd:0,gf:2},'Saudi Arabia':{p:2,pts:1,gd:-4,gf:1},
  'France':{p:2,pts:6,gd:5,gf:6},'Norway':{p:2,pts:6,gd:4,gf:7},'Senegal':{p:2,pts:0,gd:-3,gf:3},'Iraq':{p:2,pts:0,gd:-6,gf:1},
  'Argentina':{p:2,pts:6,gd:4,gf:4},'Austria':{p:2,pts:3,gd:1,gf:3},'Algeria':{p:2,pts:3,gd:-2,gf:2},'Jordan':{p:2,pts:0,gd:-3,gf:2},
- 'Colombia':{p:1,pts:3,gd:2,gf:3},'Portugal':{p:1,pts:1,gd:0,gf:1},'DR Congo':{p:1,pts:1,gd:0,gf:1},'Uzbekistan':{p:1,pts:0,gd:-2,gf:1},
- 'England':{p:1,pts:3,gd:2,gf:4},'Ghana':{p:1,pts:3,gd:1,gf:1},'Panama':{p:1,pts:0,gd:-1,gf:0},'Croatia':{p:1,pts:0,gd:-2,gf:2}
+ 'Portugal':{p:1,pts:3,gd:5,gf:5},'Colombia':{p:1,pts:3,gd:1,gf:1},'DR Congo':{p:1,pts:0,gd:-1,gf:0},'Uzbekistan':{p:1,pts:0,gd:-5,gf:0},
+ 'England':{p:2,pts:4,gd:2,gf:4},'Ghana':{p:2,pts:4,gd:1,gf:1},'Croatia':{p:2,pts:3,gd:-1,gf:3},'Panama':{p:2,pts:0,gd:-2,gf:0}
 };
-const SNAPSHOT_LABEL='snapshot · 24 Jun 2026';
+const SNAPSHOT_LABEL='snapshot · 25 Jun 2026';
 function ST(t){return TEAMSTATS[t?t.trim():'']||null;}
 function cmpStat(x,y){const a=ST(x)||{pts:-9,gd:-99,gf:-9},b=ST(y)||{pts:-9,gd:-99,gf:-9};return (b.pts-a.pts)||(b.gd-a.gd)||(b.gf-a.gf);}
 function applyAutoOrder(){GROUP_LETTERS.forEach(g=>{if(state.manual[g])return;state.groups[g]=state.groups[g].slice().sort(cmpStat);});}
-function thirdsRanking(){const rows=GROUP_LETTERS.map(g=>{const t=state.groups[g][2];const s=ST(t)||{p:0,pts:0,gd:0,gf:0};return{g:g,t:t,p:s.p||0,pts:s.pts||0,gd:s.gd||0,gf:s.gf||0};});rows.sort((a,b)=>(b.pts-a.pts)||(b.gd-a.gd)||(b.gf-a.gf)||(a.g<b.g?-1:1));return rows;}
+function thirdsRanking(){const rows=GROUP_LETTERS.map(g=>{const sorted=state.groups[g].slice().sort(cmpStat);const t=sorted[2]||'';const s=ST(t)||{p:0,pts:0,gd:0,gf:0};return{g:g,t:t,p:s.p||0,pts:s.pts||0,gd:s.gd||0,gf:s.gf||0};});rows.sort((a,b)=>(b.pts-a.pts)||(b.gd-a.gd)||(b.gf-a.gf)||(a.g<b.g?-1:1));return rows;}
 
 /* ===== STATE ===== */
 const STORE='wc26-visual-v1';
@@ -463,7 +463,30 @@ function drawConnectors(){
   });
   svg.innerHTML='<path d="'+d+'" fill="none" stroke="#9FC0B5" stroke-width="1.9"/>';
 }
-function renderThirds(){const rows=thirdsRanking();const host=document.getElementById('thirdsTable');if(!host)return;let h='<table class="t3"><colgroup><col style="width:24px"><col style="width:160px"><col style="width:32px"><col style="width:28px"><col style="width:36px"><col style="width:40px"><col style="width:32px"><col style="width:50px"></colgroup><thead><tr><th>#</th><th>Team</th><th>Grp</th><th>P</th><th>Pts</th><th>GD</th><th>GF</th><th></th></tr></thead><tbody>';rows.forEach((r,i)=>{const q=i<8;const gd=(r.gd>0?'+':'')+r.gd;h+='<tr class="'+(q?'q':'out')+'"><td class="rk">'+(i+1)+'</td><td><span class="tm-cell" data-flagteam="'+(r.t||'').replace(/"/g,'')+'"><b>'+(flagFor(r.t)||r.t||'\u2014')+'</b> '+(r.t||'\u2014')+'</span></td><td>'+r.g+'</td><td>'+r.p+'</td><td><b>'+r.pts+'</b></td><td>'+gd+'</td><td>'+r.gf+'</td><td>'+(q?'<span class="qbadge">QUAL</span>':'<span class="obadge">out</span>')+'</td></tr>';});h+='</tbody></table>';host.innerHTML=h;host.querySelectorAll('[data-flagteam]').forEach(el=>{const t=el.getAttribute('data-flagteam');const fn=flagNode(t);el.insertBefore(fn,el.firstChild);el.querySelector('b').style.display='none';});}
+function renderThirds(){
+  const rows=thirdsRanking();
+  const host=document.getElementById('thirdsTable');if(!host)return;
+  host.innerHTML='';
+  const tbl=document.createElement('table');tbl.className='t3';
+  tbl.innerHTML='<colgroup><col style="width:22px"><col style="width:28px"><col style="width:auto"><col style="width:28px"><col style="width:28px"><col style="width:36px"><col style="width:32px"><col style="width:28px"><col style="width:50px"></colgroup><thead><tr><th>#</th><th></th><th>Team</th><th>Grp</th><th>P</th><th>Pts</th><th>GD</th><th>GF</th><th></th></tr></thead>';
+  const tbody=document.createElement('tbody');
+  rows.forEach((r,i)=>{
+    const q=i<8;
+    const tr=document.createElement('tr');tr.className=q?'q':'out';
+    const gd=(r.gd>0?'+':'')+r.gd;
+    const rkTd=document.createElement('td');rkTd.className='rk';rkTd.textContent=i+1;tr.appendChild(rkTd);
+    const flTd=document.createElement('td');flTd.appendChild(flagNode(r.t||''));tr.appendChild(flTd);
+    const nmTd=document.createElement('td');nmTd.textContent=r.t||'—';tr.appendChild(nmTd);
+    const grpTd=document.createElement('td');grpTd.textContent=r.g;tr.appendChild(grpTd);
+    const pTd=document.createElement('td');pTd.textContent=r.p;tr.appendChild(pTd);
+    const ptsTd=document.createElement('td');const ptsBold=document.createElement('b');ptsBold.textContent=r.pts;ptsTd.appendChild(ptsBold);tr.appendChild(ptsTd);
+    const gdTd=document.createElement('td');gdTd.textContent=gd;tr.appendChild(gdTd);
+    const gfTd=document.createElement('td');gfTd.textContent=r.gf;tr.appendChild(gfTd);
+    const badgeTd=document.createElement('td');const badge=document.createElement('span');badge.className=q?'qbadge':'obadge';badge.textContent=q?'QUAL':'out';badgeTd.appendChild(badge);tr.appendChild(badgeTd);
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);host.appendChild(tbl);
+}
 function refresh(){applyAutoOrder();renderWall();paint();renderThirds();requestAnimationFrame(drawConnectors);}
 
 /* ===== BUTTONS ===== */
@@ -487,23 +510,46 @@ function autoPickThirds(){if(Object.keys(state.thirdQual).length)return;thirdsRa
 function normName(n){if(!n)return '';const s=(''+n).trim();const low=s.toLowerCase();const SYN={'united states':'USA','usa':'USA','korea republic':'South Korea','south korea':'South Korea','ir iran':'Iran','iran':'Iran','turkiye':'Türkiye','türkiye':'Türkiye','turkey':'Türkiye',"cote d'ivoire":'Ivory Coast',"côte d'ivoire":'Ivory Coast','ivory coast':'Ivory Coast','cabo verde':'Cape Verde','cape verde':'Cape Verde','czechia':'Czechia','czech republic':'Czechia','bosnia and herzegovina':'Bosnia & Herzegovina','bosnia & herzegovina':'Bosnia & Herzegovina','dr congo':'DR Congo','congo dr':'DR Congo','democratic republic of the congo':'DR Congo','curacao':'Curaçao','curaçao':'Curaçao'};if(SYN[low])return SYN[low];const known=Object.keys(CODES);for(const k of known){if(k.toLowerCase()===low)return k;}return '';}
 function num(v){const n=parseFloat(v);return isNaN(n)?null:n;}
 function setLive(txt,ok){const el=document.getElementById('liveStatus');if(el){el.textContent=txt;el.style.color=ok?'var(--mint)':'var(--muted-2)';}}
+function parseEntries(entries,upd){
+  (entries||[]).forEach(e=>{
+    try{
+      const nm=normName(e.team&&(e.team.displayName||e.team.name||e.team.shortDisplayName||e.team.abbreviation));
+      if(!nm)return;
+      const st={};(e.stats||[]).forEach(x=>{const k=x.name||x.type||x.shortDisplayName||x.label||'';if(k)st[k]=x.value;});
+      const pts=num(st.points)||num(st.pts)||num(st.PTS)||0;
+      const gf=num(st.pointsFor)||num(st.goalsScored)||num(st.GF)||0;
+      const ga=num(st.pointsAgainst)||num(st.goalsAllowed)||num(st.GA)||0;
+      const pl=num(st.gamesPlayed)||num(st.GP)||num(st.played)||0;
+      const gd=num(st.pointDifferential)||num(st.GD)||(gf-ga)||0;
+      TEAMSTATS[nm]={p:pl,pts:pts,gd:gd,gf:gf};upd.n++;
+    }catch(ex){}
+  });
+}
+function extractEntries(j){
+  const all=[];
+  function walk(o){if(!o||typeof o!=='object')return;if(Array.isArray(o.entries)&&o.entries.length&&o.entries[0].team){all.push(...o.entries);return;}Object.values(o).forEach(v=>{if(v&&typeof v==='object')walk(v);});}
+  walk(j);return all;
+}
 async function fetchLive(manualClick){
   setLive('Checking live results…',false);
-  try{
-    const res=await fetch('https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings?season=2026',{cache:'no-store'});
-    if(!res.ok)throw 0;const j=await res.json();
-    const groups=j.children||(j.standings?[{standings:j.standings}]:[]);let upd=0;
-    groups.forEach(ch=>{const ents=(ch.standings&&ch.standings.entries)||[];ents.forEach(e=>{
-      const nm=normName(e.team&&(e.team.displayName||e.team.name||e.team.shortDisplayName));if(!nm)return;
-      const st={};(e.stats||[]).forEach(x=>{st[x.name||x.type||x.shortDisplayName]=x.value;});
-      const pts=num(st.points),gf=num(st.pointsFor),ga=num(st.pointsAgainst),pl=num(st.gamesPlayed);
-      let gd=num(st.pointDifferential);if(gd==null&&gf!=null&&ga!=null)gd=gf-ga;
-      if(pts==null&&gf==null)return;
-      TEAMSTATS[nm]={p:pl||0,pts:pts||0,gd:gd||0,gf:gf||0};upd++;
-    });});
-    if(upd>=20){applyAutoOrder();renderGroups();refresh();save();setLive('Live · updated '+new Date().toLocaleString(),true);}
-    else throw 0;
-  }catch(e){setLive('Live feed unavailable — showing '+SNAPSHOT_LABEL,false);}
+  const URLS=['https://site.api.espn.com/apis/v2/sports/soccer/fifa.world/standings?season=2026','https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/standings'];
+  let upd={n:0};
+  for(const url of URLS){
+    try{
+      const res=await fetch(url,{cache:'no-store',credentials:'omit'});
+      if(!res.ok)continue;
+      const j=await res.json();
+      const entries=extractEntries(j);
+      parseEntries(entries,upd);
+      if(upd.n>=10)break;
+    }catch(ex){}
+  }
+  if(upd.n>=10){
+    applyAutoOrder();renderGroups();refresh();save();
+    setLive('Live · updated '+new Date().toLocaleString(),true);
+  }else{
+    setLive('Live feed unavailable — showing '+SNAPSHOT_LABEL,false);
+  }
 }
 document.getElementById('syncBtn').addEventListener('click',()=>{state.manual={};applyAutoOrder();renderGroups();refresh();save();});
 document.getElementById('top8Btn').addEventListener('click',()=>{state.thirdQual={};thirdsRanking().slice(0,8).forEach(r=>{state.thirdQual[r.g]=true;});renderGroups();refresh();save();});

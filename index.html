@@ -360,8 +360,18 @@ function computeThirdMap(){THIRD_MAP={};const sel=selectedThirds();if(sel.length
 
 /* ===== PERSIST ===== */
 let ft;function flash(){const s=document.getElementById('status');s.innerHTML='<span class="dot">&#9679;</span> Saved';clearTimeout(ft);ft=setTimeout(()=>{s.innerHTML='<span class="dot">&#9679;</span> Saved automatically';},1200);}
-async function save(){try{if(window.storage)await window.storage.set(STORE,JSON.stringify(state),false);}catch(e){}flash();}
-async function load(){try{if(window.storage){const r=await window.storage.get(STORE,false);if(r&&r.value){const d=JSON.parse(r.value);state.groups=d.groups||clone(GROUPS_INIT);state.thirdQual=d.thirdQual||{};state.adv=d.adv||{};state.manual=d.manual||{};}}}catch(e){}}
+async function save(){
+  const d=JSON.stringify(state);
+  try{if(window.storage)await window.storage.set(STORE,d,false);}catch(e){}
+  try{localStorage.setItem(STORE,d);}catch(e){}
+  flash();
+}
+function applyLoaded(d){if(!d)return;try{state.groups=d.groups||clone(GROUPS_INIT);state.thirdQual=d.thirdQual||{};state.adv=d.adv||{};state.manual=d.manual||{};}catch(e){}}
+async function load(){
+  let loaded=false;
+  try{if(window.storage){const r=await window.storage.get(STORE,false);if(r&&r.value){applyLoaded(JSON.parse(r.value));loaded=true;}}}catch(e){}
+  if(!loaded){try{const d=localStorage.getItem(STORE);if(d){applyLoaded(JSON.parse(d));}}catch(e){}}
+}
 
 /* ===== GROUPS UI ===== */
 function renderGroups(){
@@ -465,29 +475,39 @@ function drawConnectors(){
 }
 function renderThirds(){
   const rows=thirdsRanking();
-  const host=document.getElementById('thirdsTable');if(!host)return;
-  host.innerHTML='';
-  const tbl=document.createElement('table');tbl.className='t3';
-  tbl.innerHTML='<colgroup><col style="width:22px"><col style="width:28px"><col style="width:auto"><col style="width:28px"><col style="width:28px"><col style="width:36px"><col style="width:32px"><col style="width:28px"><col style="width:50px"></colgroup><thead><tr><th>#</th><th></th><th>Team</th><th>Grp</th><th>P</th><th>Pts</th><th>GD</th><th>GF</th><th></th></tr></thead>';
-  const tbody=document.createElement('tbody');
+  const host=document.getElementById('thirdsTable');
+  if(!host)return;
+  let h='<table class="t3"><thead><tr><th>#</th><th>Grp</th><th colspan="2">3rd-placed team</th><th>P</th><th>Pts</th><th>GD</th><th>GF</th><th></th></tr></thead><tbody>';
   rows.forEach((r,i)=>{
     const q=i<8;
-    const tr=document.createElement('tr');tr.className=q?'q':'out';
     const gd=(r.gd>0?'+':'')+r.gd;
-    const rkTd=document.createElement('td');rkTd.className='rk';rkTd.textContent=i+1;tr.appendChild(rkTd);
-    const flTd=document.createElement('td');flTd.appendChild(flagNode(r.t||''));tr.appendChild(flTd);
-    const nmTd=document.createElement('td');nmTd.textContent=r.t||'—';tr.appendChild(nmTd);
-    const grpTd=document.createElement('td');grpTd.textContent=r.g;tr.appendChild(grpTd);
-    const pTd=document.createElement('td');pTd.textContent=r.p;tr.appendChild(pTd);
-    const ptsTd=document.createElement('td');const ptsBold=document.createElement('b');ptsBold.textContent=r.pts;ptsTd.appendChild(ptsBold);tr.appendChild(ptsTd);
-    const gdTd=document.createElement('td');gdTd.textContent=gd;tr.appendChild(gdTd);
-    const gfTd=document.createElement('td');gfTd.textContent=r.gf;tr.appendChild(gfTd);
-    const badgeTd=document.createElement('td');const badge=document.createElement('span');badge.className=q?'qbadge':'obadge';badge.textContent=q?'QUAL':'out';badgeTd.appendChild(badge);tr.appendChild(badgeTd);
-    tbody.appendChild(tr);
+    const code=flagFor(r.t)||'';
+    h+='<tr class="'+(q?'q':'out')+'">'
+     +'<td class="rk">'+(i+1)+'</td>'
+     +'<td>'+r.g+'</td>'
+     +'<td class="t3flag" data-team="'+(r.t||'').replace(/"/g,'')+'"></td>'
+     +'<td>'+(r.t||'—')+'</td>'
+     +'<td>'+r.p+'</td>'
+     +'<td><b>'+r.pts+'</b></td>'
+     +'<td>'+gd+'</td>'
+     +'<td>'+r.gf+'</td>'
+     +'<td>'+(q?'<span class="qbadge">QUAL</span>':'<span class="obadge">out</span>')+'</td>'
+     +'</tr>';
   });
-  tbl.appendChild(tbody);host.appendChild(tbl);
+  h+='</tbody></table>';
+  host.innerHTML=h;
+  host.querySelectorAll('.t3flag').forEach(function(td){
+    const t=td.getAttribute('data-team');
+    if(t)try{td.appendChild(flagNode(t));}catch(e){}
+  });
 }
-function refresh(){applyAutoOrder();renderWall();paint();renderThirds();requestAnimationFrame(drawConnectors);}
+function refresh(){
+  applyAutoOrder();
+  try{renderWall();}catch(e){console.warn('renderWall',e);}
+  try{paint();}catch(e){console.warn('paint',e);}
+  renderThirds();
+  requestAnimationFrame(drawConnectors);
+}
 
 /* ===== BUTTONS ===== */
 document.getElementById('printBtn').addEventListener('click',()=>window.print());
@@ -501,7 +521,7 @@ document.getElementById('importBtn').addEventListener('click',()=>document.getEl
 document.getElementById('importFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();
   r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||!d.groups)throw 0;state.groups=d.groups;state.thirdQual=d.thirdQual||{};state.adv=d.adv||{};state.manual=d.manual||{};renderGroups();refresh();save();const s=document.getElementById('status');s.innerHTML='<span class="dot">&#9679;</span> Picks loaded';setTimeout(()=>{s.innerHTML='<span class="dot">&#9679;</span> Saved automatically';},1800);}catch(err){const s=document.getElementById('status');s.innerHTML='<span class="dot" style="color:#E0913C">&#9679;</span> Could not read that file';setTimeout(()=>{s.innerHTML='<span class="dot">&#9679;</span> Saved automatically';},2200);}e.target.value='';};r.readAsText(f);});
 document.getElementById('clearKO').addEventListener('click',()=>{state.adv={};renderGroups();refresh();save();});
-document.getElementById('resetAll').addEventListener('click',async()=>{state={groups:clone(GROUPS_INIT),thirdQual:{},adv:{},manual:{}};try{if(window.storage)await window.storage.delete(STORE,false);}catch(e){}applyAutoOrder();autoPickThirds();renderGroups();refresh();flash();});
+document.getElementById('resetAll').addEventListener('click',async()=>{state={groups:clone(GROUPS_INIT),thirdQual:{},adv:{},manual:{}};try{if(window.storage)await window.storage.delete(STORE,false);}catch(e){}try{localStorage.removeItem(STORE);}catch(e){}applyAutoOrder();autoPickThirds();renderGroups();refresh();flash();});
 window.addEventListener('resize',()=>requestAnimationFrame(drawConnectors));
 document.getElementById('wallWrap').addEventListener('scroll',()=>requestAnimationFrame(drawConnectors));
 

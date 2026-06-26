@@ -527,6 +527,7 @@ document.getElementById('wallWrap').addEventListener('scroll',()=>requestAnimati
 
 /* ===== INIT ===== */
 function autoPickThirds(){if(Object.keys(state.thirdQual).length)return;thirdsRanking().slice(0,8).forEach(r=>{state.thirdQual[r.g]=true;});}
+function autoPickThirds2(){state.thirdQual={};thirdsRanking().slice(0,8).forEach(r=>{state.thirdQual[r.g]=true;});}
 function normName(n){if(!n)return '';const s=(''+n).trim();const low=s.toLowerCase();const SYN={'united states':'USA','usa':'USA','korea republic':'South Korea','south korea':'South Korea','ir iran':'Iran','iran':'Iran','turkiye':'Türkiye','türkiye':'Türkiye','turkey':'Türkiye',"cote d'ivoire":'Ivory Coast',"côte d'ivoire":'Ivory Coast','ivory coast':'Ivory Coast','cabo verde':'Cape Verde','cape verde':'Cape Verde','czechia':'Czechia','czech republic':'Czechia','bosnia and herzegovina':'Bosnia & Herzegovina','bosnia & herzegovina':'Bosnia & Herzegovina','dr congo':'DR Congo','congo dr':'DR Congo','democratic republic of the congo':'DR Congo','curacao':'Curaçao','curaçao':'Curaçao'};if(SYN[low])return SYN[low];const known=Object.keys(CODES);for(const k of known){if(k.toLowerCase()===low)return k;}return '';}
 function num(v){const n=parseFloat(v);return isNaN(n)?null:n;}
 function setLive(txt,ok){const el=document.getElementById('liveStatus');if(el){el.textContent=txt;el.style.color=ok?'var(--mint)':'var(--muted-2)';}}
@@ -565,13 +566,13 @@ async function fetchLive(manualClick){
     }catch(ex){}
   }
   if(upd.n>=10){
-    applyAutoOrder();renderGroups();refresh();save();
-    setLive('Live · updated '+new Date().toLocaleString(),true);
+    state.manual={};applyAutoOrder();renderGroups();refresh();save();
+    autoPickThirds2();setLive('Live · updated '+new Date().toLocaleString(),true);
   }else{
     setLive('Live feed unavailable — showing '+SNAPSHOT_LABEL,false);
   }
 }
-document.getElementById('syncBtn').addEventListener('click',()=>{state.manual={};applyAutoOrder();renderGroups();refresh();save();});
+document.getElementById('syncBtn').addEventListener('click',()=>{state.manual={};applyAutoOrder();autoPickThirds2();renderGroups();refresh();save();});
 document.getElementById('top8Btn').addEventListener('click',()=>{state.thirdQual={};thirdsRanking().slice(0,8).forEach(r=>{state.thirdQual[r.g]=true;});renderGroups();refresh();save();});
 document.getElementById('refreshBtn').addEventListener('click',()=>fetchLive(true));
 const HOMES=[['Morocco','MAR'],['Australia','AUS'],['USA','USA'],['France','FRA'],['Switzerland','SUI']];
